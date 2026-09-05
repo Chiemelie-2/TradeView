@@ -14,12 +14,46 @@ import {
   FileText, 
   QrCode,
   CheckCircle2,
-  ChevronLeft
+  ChevronLeft,
+  Lock,
+  Mail,
+  Key,
+  Eye,
+  EyeOff,
+  UserPlus,
+  LogIn,
+  Building2,
+  UserCheck,
+  Sparkles
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 export const DepositFlow: React.FC = () => {
-  const { paymentMethods, submitDeposit, setCurrentRoute, user, showToast } = useApp();
+  const { 
+    paymentMethods, 
+    submitDeposit, 
+    setCurrentRoute, 
+    user, 
+    showToast,
+    isAuthenticated,
+    registerAccount,
+    login,
+    loginWithGoogle,
+    openEmailModal
+  } = useApp();
+
+  // Pre-deposit authentication gate state
+  const [authTab, setAuthTab] = useState<'register' | 'login'>('register');
+  const [regFullName, setRegFullName] = useState('');
+  const [regEmail, setRegEmail] = useState('');
+  const [regPassword, setRegPassword] = useState('');
+  const [regShowPassword, setRegShowPassword] = useState(false);
+  const [regAccountType, setRegAccountType] = useState<'individual' | 'institutional' | 'family_office'>('individual');
+
+  const [loginEmail, setLoginEmail] = useState('');
+  const [loginPassword, setLoginPassword] = useState('');
+  const [loginShowPassword, setLoginShowPassword] = useState(false);
+  const [isAuthSubmitting, setIsAuthSubmitting] = useState(false);
 
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [selectedMethod, setSelectedMethod] = useState<PaymentMethod | null>(null);
@@ -38,6 +72,67 @@ export const DepositFlow: React.FC = () => {
   const cryptoMethods = activeMethods.filter(m => m.type === 'crypto');
 
   const [methodTab, setMethodTab] = useState<'bank' | 'crypto'>('bank');
+
+  // Pre-deposit auth handlers
+  const handlePreDepositRegister = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!regFullName.trim() || !regEmail.trim()) {
+      showToast('Validation Error', 'Please enter your full legal name and email address.', 'warning');
+      return;
+    }
+    if (!regPassword.trim() || regPassword.length < 6) {
+      showToast('Password Error', 'Please create a secure password with at least 6 characters.', 'warning');
+      return;
+    }
+
+    setIsAuthSubmitting(true);
+    setTimeout(() => {
+      registerAccount(regFullName, regEmail, regAccountType, 'email', regPassword);
+      setIsAuthSubmitting(false);
+      showToast(
+        'Registration Confirmed',
+        `Official verification email dispatched to ${regEmail}. You may now proceed with funding.`,
+        'success'
+      );
+    }, 400);
+  };
+
+  const handlePreDepositLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!loginEmail.trim()) {
+      showToast('Validation Error', 'Please enter your registered email address.', 'warning');
+      return;
+    }
+
+    setIsAuthSubmitting(true);
+    setTimeout(() => {
+      const res = login(loginEmail, loginPassword, 'investor');
+      setIsAuthSubmitting(false);
+      if (res.success) {
+        showToast('Signed In', 'Welcome back! You may now select your funding method.', 'success');
+      } else {
+        showToast('Access Denied', res.message || 'Invalid email or password.', 'danger');
+      }
+    }, 350);
+  };
+
+  const handleQuickDemoInvestor = () => {
+    setIsAuthSubmitting(true);
+    setTimeout(() => {
+      login('a.montgomery@vancecapital.org', 'demo123', 'investor');
+      setIsAuthSubmitting(false);
+      showToast('Demo Access Granted', 'Authenticated as Sir Arthur Montgomery (Accredited Investor).', 'success');
+    }, 250);
+  };
+
+  const handleGoogleAuth = () => {
+    setIsAuthSubmitting(true);
+    setTimeout(() => {
+      loginWithGoogle('princesamuel0903@gmail.com', 'Samuel Prince');
+      setIsAuthSubmitting(false);
+      showToast('Google Authenticated', 'Account verified and confirmation email dispatched.', 'success');
+    }, 350);
+  };
 
   const handleCopy = (text: string, keyName: string) => {
     navigator.clipboard.writeText(text);
@@ -144,13 +239,392 @@ export const DepositFlow: React.FC = () => {
     );
   }
 
+  // Pre-Deposit Authentication Gate: Mandatory register or login step before making any deposit
+  if (!isAuthenticated) {
+    return (
+      <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
+        {/* Step Progress Tracker */}
+        <div className="flex items-center justify-between border-b border-white/10 pb-5">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-500">
+              <ShieldCheck className="w-5 h-5" />
+            </div>
+            <div>
+              <span className="text-[10px] font-mono uppercase tracking-widest text-amber-500 font-bold block">
+                MANDATORY CLEARANCE • STEP 1 OF 2
+              </span>
+              <h1 className="font-serif text-2xl font-bold text-white tracking-tight">
+                Depository Account Required
+              </h1>
+            </div>
+          </div>
+          <div className="hidden sm:flex items-center gap-2">
+            <div className="w-7 h-7 rounded-full bg-amber-500 text-black font-mono text-xs font-bold flex items-center justify-center ring-4 ring-amber-500/20">
+              1
+            </div>
+            <div className="w-8 h-0.5 bg-white/10"></div>
+            <div className="w-7 h-7 rounded-full bg-[#0a0a0a] text-gray-500 border border-white/10 font-mono text-xs font-bold flex items-center justify-center">
+              2
+            </div>
+          </div>
+        </div>
+
+        {/* Informational Guidance Box */}
+        <div className="p-4 rounded-xl bg-white/[0.03] border border-white/10 text-xs text-gray-300 space-y-1.5">
+          <div className="flex items-center gap-2 text-amber-400 font-semibold">
+            <Lock className="w-3.5 h-3.5" />
+            <span>Registration Required Before Depositing Capital</span>
+          </div>
+          <p className="text-gray-400 leading-relaxed text-[11px]">
+            To comply with international custodial regulations and ensure proper segregation of investor assets, you must register your depository account (or sign in if you already have one) before receiving bank wire coordinates or generating cryptocurrency depository addresses.
+          </p>
+        </div>
+
+        {/* Mode Switcher Tabs */}
+        <div className="grid grid-cols-2 gap-1 p-1 bg-[#0a0a0a] rounded-xl border border-white/10">
+          <button
+            type="button"
+            onClick={() => setAuthTab('register')}
+            className={`flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+              authTab === 'register'
+                ? 'bg-amber-500 text-black shadow-md font-bold'
+                : 'text-gray-400 hover:text-white hover:bg-white/5'
+            }`}
+          >
+            <UserPlus className="w-3.5 h-3.5" />
+            <span>1. Register Account First</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setAuthTab('login')}
+            className={`flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+              authTab === 'login'
+                ? 'bg-amber-500 text-black shadow-md font-bold'
+                : 'text-gray-400 hover:text-white hover:bg-white/5'
+            }`}
+          >
+            <LogIn className="w-3.5 h-3.5" />
+            <span>Sign In (Existing Account)</span>
+          </button>
+        </div>
+
+        {/* Tab 1: Registration Form (Default) */}
+        {authTab === 'register' ? (
+          <form onSubmit={handlePreDepositRegister} className="p-6 rounded-2xl bg-[#0a0a0a] border border-white/10 space-y-5">
+            <div className="space-y-1">
+              <h2 className="text-base font-bold text-white flex items-center gap-2">
+                <Building2 className="w-4 h-4 text-amber-500" />
+                <span>Create Depository Investor Account</span>
+              </h2>
+              <p className="text-xs text-gray-400">
+                Enter your details to generate your isolated depository account and receive your confirmation email.
+              </p>
+            </div>
+
+            {/* Full Name */}
+            <div>
+              <label className="block text-xs font-medium text-gray-300 mb-1.5">
+                Full Legal Name / Institutional Entity Name <span className="text-amber-500">*</span>
+              </label>
+              <div className="relative">
+                <Building2 className="w-4 h-4 text-gray-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  value={regFullName}
+                  onChange={(e) => setRegFullName(e.target.value)}
+                  placeholder="e.g. Samuel Prince / Vance Capital Management LLC"
+                  required
+                  className="w-full bg-[#050505] border border-white/10 rounded-xl pl-10 pr-4 py-2.5 text-xs text-white placeholder:text-gray-600 focus:outline-none focus:border-amber-500 transition-colors"
+                />
+              </div>
+            </div>
+
+            {/* Email */}
+            <div>
+              <label className="block text-xs font-medium text-gray-300 mb-1.5">
+                Email Address <span className="text-amber-500">*</span>
+              </label>
+              <div className="relative">
+                <Mail className="w-4 h-4 text-gray-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <input
+                  type="email"
+                  value={regEmail}
+                  onChange={(e) => setRegEmail(e.target.value)}
+                  placeholder="e.g. princesamuel0903@gmail.com"
+                  required
+                  className="w-full bg-[#050505] border border-white/10 rounded-xl pl-10 pr-4 py-2.5 text-xs text-white placeholder:text-gray-600 focus:outline-none focus:border-amber-500 transition-colors"
+                />
+              </div>
+              <span className="text-[10px] text-amber-400/90 mt-1 block font-mono">
+                ✉️ An official confirmation email with your unique Depository ID will be sent here upon submission.
+              </span>
+            </div>
+
+            {/* Password */}
+            <div>
+              <label className="block text-xs font-medium text-gray-300 mb-1.5">
+                Account Password <span className="text-amber-500">*</span>
+              </label>
+              <div className="relative">
+                <Key className="w-4 h-4 text-gray-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <input
+                  type={regShowPassword ? 'text' : 'password'}
+                  value={regPassword}
+                  onChange={(e) => setRegPassword(e.target.value)}
+                  placeholder="Create password (minimum 6 characters)"
+                  required
+                  minLength={6}
+                  className="w-full bg-[#050505] border border-white/10 rounded-xl pl-10 pr-10 py-2.5 text-xs text-white placeholder:text-gray-600 focus:outline-none focus:border-amber-500 transition-colors"
+                />
+                <button
+                  type="button"
+                  onClick={() => setRegShowPassword(!regShowPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white transition-colors cursor-pointer"
+                >
+                  {regShowPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
+
+            {/* Account Classification */}
+            <div>
+              <label className="block text-xs font-medium text-gray-300 mb-1.5">
+                Account Classification
+              </label>
+              <div className="grid grid-cols-3 gap-2">
+                {[
+                  { id: 'individual', label: 'Accredited Individual' },
+                  { id: 'institutional', label: 'Institutional Entity' },
+                  { id: 'family_office', label: 'Family Office' }
+                ].map((type) => (
+                  <button
+                    key={type.id}
+                    type="button"
+                    onClick={() => setRegAccountType(type.id as any)}
+                    className={`p-2 rounded-xl text-[11px] font-medium border text-center transition-all cursor-pointer ${
+                      regAccountType === type.id
+                        ? 'bg-amber-500/15 border-amber-500 text-amber-300'
+                        : 'bg-[#050505] border-white/10 text-gray-400 hover:text-white'
+                    }`}
+                  >
+                    {type.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Confirmation Email Guarantee Banner */}
+            <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-300/90 flex items-start gap-2.5">
+              <Mail className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+              <div className="space-y-0.5 text-[11px]">
+                <span className="font-bold text-amber-400 block">Instant Email Confirmation</span>
+                <span className="text-gray-300">
+                  Once registered, a confirmation email will be immediately delivered to your inbox with your permanent Depository Account ID, cryptographic security hash, and wire instructions authorization.
+                </span>
+              </div>
+            </div>
+
+            {/* Submit Button */}
+            <button
+              type="submit"
+              disabled={isAuthSubmitting}
+              className="w-full py-3.5 px-4 rounded-xl bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-black font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all shadow-lg hover:shadow-amber-500/20 cursor-pointer"
+            >
+              {isAuthSubmitting ? (
+                <span>Registering & Dispatching Email...</span>
+              ) : (
+                <>
+                  <UserPlus className="w-4 h-4" />
+                  <span>Register Account & Proceed to Deposit</span>
+                  <ArrowRight className="w-4 h-4" />
+                </>
+              )}
+            </button>
+
+            {/* Quick Actions */}
+            <div className="flex items-center justify-between text-xs pt-2 border-t border-white/10 text-gray-400">
+              <button
+                type="button"
+                onClick={() => setAuthTab('login')}
+                className="hover:text-amber-400 transition-colors cursor-pointer"
+              >
+                Already have an account? <span className="underline font-semibold text-white">Sign In</span>
+              </button>
+              <button
+                type="button"
+                onClick={handleGoogleAuth}
+                className="hover:text-white text-gray-400 flex items-center gap-1.5 transition-colors cursor-pointer text-[11px]"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                <span>Continue with Google</span>
+              </button>
+            </div>
+          </form>
+        ) : (
+          /* Tab 2: Login Form */
+          <form onSubmit={handlePreDepositLogin} className="p-6 rounded-2xl bg-[#0a0a0a] border border-white/10 space-y-5">
+            <div className="space-y-1">
+              <h2 className="text-base font-bold text-white flex items-center gap-2">
+                <LogIn className="w-4 h-4 text-amber-500" />
+                <span>Sign In to Existing Depository Account</span>
+              </h2>
+              <p className="text-xs text-gray-400">
+                Enter your credentials to unlock depository routing and proceed with your deposit.
+              </p>
+            </div>
+
+            {/* Email */}
+            <div>
+              <label className="block text-xs font-medium text-gray-300 mb-1.5">
+                Registered Email Address <span className="text-amber-500">*</span>
+              </label>
+              <div className="relative">
+                <Mail className="w-4 h-4 text-gray-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <input
+                  type="email"
+                  value={loginEmail}
+                  onChange={(e) => setLoginEmail(e.target.value)}
+                  placeholder="e.g. investor@vancecapital.org"
+                  required
+                  className="w-full bg-[#050505] border border-white/10 rounded-xl pl-10 pr-4 py-2.5 text-xs text-white placeholder:text-gray-600 focus:outline-none focus:border-amber-500 transition-colors"
+                />
+              </div>
+            </div>
+
+            {/* Password */}
+            <div>
+              <label className="block text-xs font-medium text-gray-300 mb-1.5">
+                Account Password <span className="text-amber-500">*</span>
+              </label>
+              <div className="relative">
+                <Key className="w-4 h-4 text-gray-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <input
+                  type={loginShowPassword ? 'text' : 'password'}
+                  value={loginPassword}
+                  onChange={(e) => setLoginPassword(e.target.value)}
+                  placeholder="••••••••••••"
+                  required
+                  className="w-full bg-[#050505] border border-white/10 rounded-xl pl-10 pr-10 py-2.5 text-xs text-white placeholder:text-gray-600 focus:outline-none focus:border-amber-500 transition-colors"
+                />
+                <button
+                  type="button"
+                  onClick={() => setLoginShowPassword(!loginShowPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white transition-colors cursor-pointer"
+                >
+                  {loginShowPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
+
+            {/* Submit Button */}
+            <button
+              type="submit"
+              disabled={isAuthSubmitting}
+              className="w-full py-3.5 px-4 rounded-xl bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-black font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all shadow-lg hover:shadow-amber-500/20 cursor-pointer"
+            >
+              {isAuthSubmitting ? (
+                <span>Verifying Credentials...</span>
+              ) : (
+                <>
+                  <LogIn className="w-4 h-4" />
+                  <span>Sign In & Proceed to Deposit</span>
+                  <ArrowRight className="w-4 h-4" />
+                </>
+              )}
+            </button>
+
+            {/* Quick Demo Access */}
+            <div className="pt-2 border-t border-white/10 space-y-2">
+              <div className="text-[10px] uppercase tracking-wider text-gray-500 font-bold text-center">
+                Instant Verification Options
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={handleQuickDemoInvestor}
+                  className="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-left transition-colors group cursor-pointer"
+                >
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-xs font-semibold text-white group-hover:text-amber-400">Demo Investor</span>
+                    <UserCheck className="w-3.5 h-3.5 text-emerald-400" />
+                  </div>
+                  <div className="text-[10px] text-gray-400 truncate">Sir Arthur Montgomery</div>
+                  <div className="text-[9px] text-gray-500 font-mono">Tier 2 Accredited</div>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleGoogleAuth}
+                  className="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-left transition-colors group cursor-pointer"
+                >
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-xs font-semibold text-white group-hover:text-blue-400">Google Auth</span>
+                    <Sparkles className="w-3.5 h-3.5 text-blue-400" />
+                  </div>
+                  <div className="text-[10px] text-gray-400 truncate">One-Click Verification</div>
+                  <div className="text-[9px] text-emerald-400 font-mono">Dispatches Email</div>
+                </button>
+              </div>
+            </div>
+
+            {/* Switch to Register */}
+            <div className="text-center pt-2 border-t border-white/10 text-xs text-gray-400">
+              Don't have an account yet?{' '}
+              <button
+                type="button"
+                onClick={() => setAuthTab('register')}
+                className="text-amber-400 hover:underline font-semibold cursor-pointer"
+              >
+                Register step first
+              </button>
+            </div>
+          </form>
+        )}
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
+      {/* Authenticated Depository User Badge */}
+      <div className="p-4 rounded-2xl bg-[#0a0a0a] border border-amber-500/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-lg">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 font-bold text-sm">
+            {user.fullName ? user.fullName.charAt(0).toUpperCase() : 'U'}
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-bold text-white">{user.fullName}</span>
+              <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 text-[10px] font-mono border border-emerald-500/20 flex items-center gap-1 font-bold">
+                <CheckCircle2 className="w-3 h-3" /> Authenticated Depository
+              </span>
+            </div>
+            <div className="text-[11px] text-gray-400 font-mono mt-0.5 flex flex-wrap items-center gap-2">
+              <span>{user.email}</span>
+              <span>•</span>
+              <span className="text-amber-400">ID: {user.id}</span>
+              <span>•</span>
+              <span className="text-gray-500">Tier {user.kycTier} Accredited</span>
+            </div>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          onClick={() => openEmailModal()}
+          className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-[11px] text-amber-400 hover:text-amber-300 font-mono flex items-center gap-1.5 transition-colors cursor-pointer shrink-0"
+          title="View official registration confirmation email"
+        >
+          <Mail className="w-3.5 h-3.5" />
+          <span>View Confirmation Email</span>
+        </button>
+      </div>
+
       {/* Header */}
       <div className="flex items-center justify-between border-b border-white/10 pb-6">
         <div>
           <span className="text-xs font-mono uppercase tracking-widest text-amber-500 block mb-1">
-            Depository Capital Inflow
+            Depository Capital Inflow • Step 2 of 2
           </span>
           <h1 className="font-serif text-3xl font-bold text-white tracking-tight">
             Fund Investor Account

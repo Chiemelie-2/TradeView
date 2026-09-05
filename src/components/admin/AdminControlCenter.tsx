@@ -23,7 +23,10 @@ import {
   Lock,
   ArrowUpRight,
   Sparkles,
-  QrCode
+  QrCode,
+  Globe,
+  MessageSquare,
+  Key
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -49,7 +52,9 @@ export const AdminControlCenter: React.FC = () => {
     campaigns,
     toggleCampaign,
     auditLogs,
-    showToast
+    showToast,
+    openTranslateModal,
+    openSmartsuppModal
   } = useApp();
 
   type AdminTab = 'payments' | 'deposits' | 'withdrawals' | 'kyc' | 'plans' | 'campaigns' | 'audit';
@@ -170,7 +175,25 @@ export const AdminControlCenter: React.FC = () => {
           </p>
         </div>
 
-        <div className="flex items-center gap-2 self-start sm:self-auto">
+        <div className="flex items-center gap-2 self-start sm:self-auto flex-wrap">
+          <button
+            type="button"
+            onClick={openTranslateModal}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#0a0a0a] hover:bg-neutral-900 border border-blue-500/40 text-blue-300 text-xs font-semibold transition-all cursor-pointer"
+            title="Configure Google Cloud Translation API Key"
+          >
+            <Globe className="w-3.5 h-3.5 text-blue-400" />
+            <span>Google Translate Key</span>
+          </button>
+          <button
+            type="button"
+            onClick={openSmartsuppModal}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#0a0a0a] hover:bg-neutral-900 border border-amber-500/40 text-amber-300 text-xs font-semibold transition-all cursor-pointer"
+            title="Configure Smartsupp Live Chat Key"
+          >
+            <MessageSquare className="w-3.5 h-3.5 text-amber-400" />
+            <span>Smartsupp Key</span>
+          </button>
           <button
             onClick={() => {
               setPaymentTypeToAdd('bank_transfer');

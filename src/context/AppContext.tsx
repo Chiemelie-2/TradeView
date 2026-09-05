@@ -17,6 +17,12 @@ import {
 } from '../types';
 import { translations, TranslationSchema } from '../i18n/translations';
 import { 
+  dispatchRegistrationEmail, 
+  DispatchedEmail, 
+  getDispatchedEmails 
+} from '../services/emailService';
+import { initSmartsupp } from '../services/smartsuppService';
+import { 
   initialUserProfile, 
   initialAdminProfile,
   initialPaymentMethods, 
@@ -67,6 +73,29 @@ interface AppContextType {
   t: TranslationSchema;
   isAuthenticated: boolean;
   login: (email: string, password?: string, requestedRole?: UserRole) => { success: boolean; message?: string };
+  registerAccount: (
+    fullName: string, 
+    email: string, 
+    accountType?: 'individual' | 'institutional' | 'family_office', 
+    authProvider?: 'email' | 'google', 
+    password?: string
+  ) => { success: boolean; emailResult?: DispatchedEmail; message?: string };
+  loginWithGoogle: (googleEmail?: string, googleName?: string) => { success: boolean; isNewUser?: boolean; emailResult?: DispatchedEmail };
+  dispatchedEmails: DispatchedEmail[];
+  lastDispatchedEmail: DispatchedEmail | null;
+  isEmailModalOpen: boolean;
+  openEmailModal: (email?: DispatchedEmail) => void;
+  closeEmailModal: () => void;
+  isGoogleVerifyModalOpen: boolean;
+  openGoogleVerifyModal: () => void;
+  closeGoogleVerifyModal: () => void;
+  isSmartsuppModalOpen: boolean;
+  openSmartsuppModal: () => void;
+  closeSmartsuppModal: () => void;
+  isTranslateModalOpen: boolean;
+  openTranslateModal: () => void;
+  closeTranslateModal: () => void;
+  verifyUserEmail: (code?: string) => { success: boolean; message: string };
   logout: () => void;
   isAuthModalOpen: boolean;
   authModalDefaultRole: 'investor' | 'admin';
@@ -272,6 +301,59 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return saved ? JSON.parse(saved) : initialSupportTickets;
   });
 
+  const [dispatchedEmails, setDispatchedEmails] = useState<DispatchedEmail[]>(() => {
+    return getDispatchedEmails();
+  });
+  const [lastDispatchedEmail, setLastDispatchedEmail] = useState<DispatchedEmail | null>(() => {
+    const list = getDispatchedEmails();
+    return list.length > 0 ? list[0] : null;
+  });
+  const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
+
+  const openEmailModal = (email?: DispatchedEmail) => {
+    if (email) {
+      setLastDispatchedEmail(email);
+    } else if (dispatchedEmails.length > 0) {
+      setLastDispatchedEmail(dispatchedEmails[0]);
+    }
+    setIsEmailModalOpen(true);
+  };
+
+  const closeEmailModal = () => {
+    setIsEmailModalOpen(false);
+  };
+
+  const [isGoogleVerifyModalOpen, setIsGoogleVerifyModalOpen] = useState(false);
+  const openGoogleVerifyModal = () => setIsGoogleVerifyModalOpen(true);
+  const closeGoogleVerifyModal = () => setIsGoogleVerifyModalOpen(false);
+
+  const [isSmartsuppModalOpen, setIsSmartsuppModalOpen] = useState(false);
+  const openSmartsuppModal = () => setIsSmartsuppModalOpen(true);
+  const closeSmartsuppModal = () => setIsSmartsuppModalOpen(false);
+
+  const [isTranslateModalOpen, setIsTranslateModalOpen] = useState(false);
+  const openTranslateModal = () => setIsTranslateModalOpen(true);
+  const closeTranslateModal = () => setIsTranslateModalOpen(false);
+
+  const verifyUserEmail = (_code?: string) => {
+    setUser(prev => ({
+      ...prev,
+      isEmailVerified: true,
+      emailVerifiedAt: new Date().toISOString()
+    }));
+    showToast(
+      'Google Email Verification Confirmed',
+      `Your account email has been verified and confirmed via Google Identity Protocol.`,
+      'success'
+    );
+    return { success: true, message: 'Google email verification successful.' };
+  };
+
+  // Initialize Smartsupp widget if key is configured
+  useEffect(() => {
+    initSmartsupp(user);
+  }, [user]);
+
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
 
   // Persist items
@@ -332,6 +414,24 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setIsAuthModalOpen(false);
   };
 
+  const getStoredAccounts = (): Array<{ email: string; password?: string; profile: UserProfile }> => {
+    try {
+      const raw = localStorage.getItem('tv_registered_accounts');
+      return raw ? JSON.parse(raw) : [];
+    } catch {
+      return [];
+    }
+  };
+
+  const saveStoredAccount = (account: { email: string; password?: string; profile: UserProfile }) => {
+    try {
+      const existing = getStoredAccounts().filter(a => a.email.toLowerCase() !== account.email.toLowerCase());
+      localStorage.setItem('tv_registered_accounts', JSON.stringify([account, ...existing]));
+    } catch {
+      // ignore
+    }
+  };
+
   const login = (email: string, _password?: string, requestedRole?: UserRole) => {
     const cleanEmail = email.trim().toLowerCase();
     const isAdmin = cleanEmail.includes('admin') || requestedRole === 'admin';
@@ -347,22 +447,126 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       } catch {
         // ignore
       }
-      setCurrentRoute('admin');
+      if (currentRoute !== 'deposit') {
+        setCurrentRoute('admin');
+      }
       return { success: true };
     } else {
-      setUser(initialUserProfile);
+      const stored = getStoredAccounts().find(a => a.email.toLowerCase() === cleanEmail);
+      const targetUser: UserProfile = stored ? stored.profile : {
+        ...initialUserProfile,
+        email: cleanEmail,
+        fullName: cleanEmail.includes('@') 
+          ? cleanEmail.split('@')[0].replace(/[\._]/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
+          : 'Accredited Investor'
+      };
+
+      setUser(targetUser);
       setActiveRoleState('investor');
       setIsAuthenticated(true);
       try {
         localStorage.setItem('tv_auth', 'true');
-        localStorage.setItem('tv_user', JSON.stringify(initialUserProfile));
+        localStorage.setItem('tv_user', JSON.stringify(targetUser));
         localStorage.setItem('tv_role', 'investor');
       } catch {
         // ignore
       }
-      setCurrentRoute('dashboard');
+      if (currentRoute !== 'deposit') {
+        setCurrentRoute('dashboard');
+      }
       return { success: true };
     }
+  };
+
+  const registerAccount = (
+    fullName: string,
+    email: string,
+    accountType: 'individual' | 'institutional' | 'family_office' = 'individual',
+    authProvider: 'email' | 'google' = 'email',
+    _password?: string
+  ) => {
+    const cleanEmail = email.trim().toLowerCase();
+    const depId = 'TV-DEP-' + Math.floor(100000 + Math.random() * 900000);
+    const displayName = fullName.trim() || (authProvider === 'google' ? 'Google Authenticated Client' : 'Institutional Client');
+
+    const newProfile: UserProfile = {
+      id: 'usr_' + Date.now().toString(36) + Math.random().toString(36).substring(2, 6),
+      fullName: displayName,
+      email: cleanEmail,
+      phone: '+1 (555) 019-8832',
+      country: 'United States',
+      role: 'investor',
+      isEmailVerified: true,
+      emailVerifiedAt: new Date().toISOString(),
+      authProvider,
+      depositoryAccountId: depId,
+      twoFactorEnabled: true,
+      is2FAEnabled: true,
+      twoFactorSecret: 'TV-TOTP-' + Math.random().toString(36).substring(2, 8).toUpperCase(),
+      kycStatus: 'in_progress',
+      kycTier: 1,
+      createdAt: new Date().toISOString(),
+      avatarUrl: authProvider === 'google'
+        ? 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=256'
+        : undefined,
+      accountType
+    };
+
+    // Save to local registry so user can sign in again with their registered credentials
+    saveStoredAccount({
+      email: cleanEmail,
+      password: _password,
+      profile: newProfile
+    });
+
+    // Dispatch the official confirmation email immediately
+    const emailResult = dispatchRegistrationEmail(displayName, cleanEmail, authProvider, depId);
+    setDispatchedEmails(prev => [emailResult, ...prev]);
+    setLastDispatchedEmail(emailResult);
+    
+    // Automatically trigger the Google Email Verification & Registration Confirmation Modal
+    setIsGoogleVerifyModalOpen(true);
+
+    setUser(newProfile);
+    setActiveRoleState('investor');
+    setIsAuthenticated(true);
+
+    try {
+      localStorage.setItem('tv_auth', 'true');
+      localStorage.setItem('tv_user', JSON.stringify(newProfile));
+      localStorage.setItem('tv_role', 'investor');
+    } catch {
+      // ignore
+    }
+
+    // Add welcoming in-app notification
+    const welcomeNotif: InAppNotification = {
+      id: 'notif_' + Date.now().toString(36),
+      userId: newProfile.id,
+      title: 'Registration Confirmation Dispatched',
+      message: `Depository ID ${depId} provisioned. An institutional confirmation email was dispatched to ${cleanEmail}.`,
+      category: 'security',
+      read: false,
+      createdAt: new Date().toISOString()
+    };
+    setNotifications(prev => [welcomeNotif, ...prev]);
+
+    if (currentRoute !== 'deposit') {
+      setCurrentRoute('dashboard');
+    }
+    showToast(
+      'Account Registered & Email Sent',
+      `Welcome to TradeVerge, ${displayName}. A confirmation email has been dispatched to ${cleanEmail}.`,
+      'success'
+    );
+
+    return { success: true, emailResult };
+  };
+
+  const loginWithGoogle = (googleEmail?: string, googleName?: string) => {
+    const targetEmail = (googleEmail && googleEmail.trim()) || 'princesamuel0903@gmail.com';
+    const targetName = (googleName && googleName.trim()) || 'Samuel Prince';
+    return registerAccount(targetName, targetEmail, 'individual', 'google');
   };
 
   const logout = () => {
@@ -904,6 +1108,23 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         t,
         isAuthenticated,
         login,
+        registerAccount,
+        loginWithGoogle,
+        dispatchedEmails,
+        lastDispatchedEmail,
+        isEmailModalOpen,
+        openEmailModal,
+        closeEmailModal,
+        isGoogleVerifyModalOpen,
+        openGoogleVerifyModal,
+        closeGoogleVerifyModal,
+        isSmartsuppModalOpen,
+        openSmartsuppModal,
+        closeSmartsuppModal,
+        isTranslateModalOpen,
+        openTranslateModal,
+        closeTranslateModal,
+        verifyUserEmail,
         logout,
         isAuthModalOpen,
         authModalDefaultRole,

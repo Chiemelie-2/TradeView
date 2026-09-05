@@ -6,6 +6,9 @@ import { ToastContainer } from './components/shared/ToastContainer';
 import { SmartsuppWidget } from './components/support/SmartsuppWidget';
 import { AuthModal } from './components/auth/AuthModal';
 import { AdminAccessGuard } from './components/admin/AdminAccessGuard';
+import { EmailDispatchModal } from './components/shared/EmailDispatchModal';
+import { GoogleEmailVerificationModal } from './components/auth/GoogleEmailVerificationModal';
+import { SmartsuppConfigModal } from './components/support/SmartsuppConfigModal';
 
 // Public Pages
 import { HomePage } from './components/public/HomePage';
@@ -40,7 +43,14 @@ const AppContent: React.FC = () => {
     isAuthModalOpen, 
     closeAuthModal, 
     authModalDefaultRole,
-    openAuthModal
+    openAuthModal,
+    isEmailModalOpen,
+    closeEmailModal,
+    lastDispatchedEmail,
+    isGoogleVerifyModalOpen,
+    closeGoogleVerifyModal,
+    isSmartsuppModalOpen,
+    closeSmartsuppModal
   } = useApp();
 
   // Scroll to top upon route change
@@ -123,11 +133,30 @@ const AppContent: React.FC = () => {
       {/* Global Toast Notification System */}
       <ToastContainer />
 
-      {/* Auth Modal for Role-differentiated Login */}
+      {/* Auth Modal for Role-differentiated Login & Registration */}
       <AuthModal 
         isOpen={isAuthModalOpen} 
         onClose={closeAuthModal} 
         defaultRole={authModalDefaultRole} 
+      />
+
+      {/* Institutional Registration Email Verification Modal */}
+      <EmailDispatchModal
+        isOpen={isEmailModalOpen}
+        onClose={closeEmailModal}
+        email={lastDispatchedEmail}
+      />
+
+      {/* Google Email Verification & Registration Confirmation Modal */}
+      <GoogleEmailVerificationModal
+        isOpen={isGoogleVerifyModalOpen}
+        onClose={closeGoogleVerifyModal}
+      />
+
+      {/* Smartsupp Live Chat Configuration Modal */}
+      <SmartsuppConfigModal
+        isOpen={isSmartsuppModalOpen}
+        onClose={closeSmartsuppModal}
       />
 
       {/* Smartsupp AI Concierge Widget (Hidden on Admin) */}

@@ -10,6 +10,10 @@ export interface UserProfile {
   country: string;
   role: UserRole;
   isEmailVerified: boolean;
+  emailVerifiedAt?: string;
+  authProvider?: 'email' | 'google';
+  depositoryAccountId?: string;
+  twoFactorEnabled?: boolean;
   is2FAEnabled: boolean;
   twoFactorSecret?: string;
   kycStatus: 'not_started' | 'in_progress' | 'submitted' | 'processing' | 'approved' | 'rejected' | 'additional_info_required';

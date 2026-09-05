@@ -54,6 +54,90 @@ export interface PageTranslations {
     segregatedReserves: string;
     auditedLedger: string;
     regulatoryCompliance: string;
+    marketplace: {
+      badge: string;
+      title: string;
+      subtitle: string;
+      searchPlaceholder: string;
+      allocateButton: string;
+    };
+    howItWorks: {
+      badge: string;
+      title: string;
+      subtitle: string;
+      steps: Array<{ step: string; title: string; desc: string }>;
+      securityBadge: string;
+      securityTitle: string;
+      securitySubtitle: string;
+      securityPoints: string[];
+      ctaTitle: string;
+      ctaDesc: string;
+      ctaButton: string;
+      explorePlansButton: string;
+    };
+    pricing: {
+      badge: string;
+      title: string;
+      subtitle: string;
+      cardInflowsTag: string;
+      cardInflowsTitle: string;
+      cardInflowsFeeLabel: string;
+      cardInflowsFeatures: string[];
+      cardInflowsCta: string;
+      cardCustodyTag: string;
+      cardCustodyTitle: string;
+      cardCustodyFeeLabel: string;
+      cardCustodyFeatures: string[];
+      cardCustodyCta: string;
+      cardRedemptionTag: string;
+      cardRedemptionTitle: string;
+      cardRedemptionFeeLabel: string;
+      cardRedemptionFeatures: string[];
+      cardRedemptionCta: string;
+    };
+    security: {
+      badge: string;
+      title: string;
+      subtitle: string;
+      cards: Array<{ title: string; desc: string }>;
+    };
+    education: {
+      badge: string;
+      title: string;
+      subtitle: string;
+      articles: Array<{ title: string; category: string; readTime: string; desc: string }>;
+    };
+    about: {
+      badge: string;
+      title: string;
+      subtitle: string;
+      pillars: Array<{ title: string; desc: string }>;
+    };
+    contact: {
+      badge: string;
+      title: string;
+      subtitle: string;
+      formTitle: string;
+      formSubtitle: string;
+      labelName: string;
+      labelEmail: string;
+      labelCategory: string;
+      labelSubject: string;
+      labelMessage: string;
+      submitButton: string;
+      globalOffices: string;
+    };
+    legal: {
+      badge: string;
+      title: string;
+      lastUpdated: string;
+      tabs: {
+        terms: string;
+        privacy: string;
+        aml: string;
+        risk: string;
+      };
+    };
   };
   investorPages: {
     transactionsTitle: string;
@@ -71,8 +155,56 @@ export interface PageTranslations {
     twoFaStatus: string;
     kycTierLevel: string;
     accountSecurity: string;
+    transactions: {
+      badge: string;
+      title: string;
+      subtitle: string;
+      exportCsv: string;
+      searchPlaceholder: string;
+      colEntry: string;
+      colType: string;
+      colDescription: string;
+      colAmount: string;
+      colTimestamp: string;
+      colStatus: string;
+      colAction: string;
+    };
+    documents: {
+      badge: string;
+      title: string;
+      subtitle: string;
+      downloadButton: string;
+    };
+    profile: {
+      badge: string;
+      title: string;
+      subtitle: string;
+      cardProfile: string;
+      card2Fa: string;
+      enable2Fa: string;
+      activeSessions: string;
+    };
+    kyc: {
+      badge: string;
+      title: string;
+      submitButton: string;
+    };
   };
   footer: {
+    segregatedLedgers: string;
+    segregatedLedgersDesc: string;
+    tier1Custody: string;
+    tier1CustodyDesc: string;
+    deterministicExecution: string;
+    deterministicExecutionDesc: string;
+    continuousSettlement: string;
+    continuousSettlementDesc: string;
+    brandDesc: string;
+    colInvestments: string;
+    colPlatform: string;
+    colPortals: string;
+    disclaimerTitle: string;
+    disclaimerBody: string;
     tagline: string;
     regulatoryNotice: string;
     riskDisclaimer: string;
@@ -83,825 +215,882 @@ export interface PageTranslations {
   };
 }
 
-export const pageTranslations: Record<LanguageCode, PageTranslations> = {
-  en: {
-    auth: {
-      signIn: 'Client Sign In',
-      clientAccess: 'Portal Access',
-      investorTab: 'Investor Portal',
-      adminTab: 'Compliance & Admin',
-      investorTitle: 'Private Wealth Portal',
-      investorDesc: 'Access segregated custody, active yield allocations, and audited ledger accounts.',
-      adminTitle: 'Depository Admin Console',
-      adminDesc: 'Restricted to authorized compliance, treasury, and custody clearing officers.',
-      emailLabel: 'Authorized Email',
-      passwordLabel: 'Cryptographic Credential / Password',
-      twoFaBadge: 'Hardware 2FA / TOTP Protected',
-      rememberMe: 'Remember terminal session',
-      forgotPassword: 'Reset via custody desk',
-      signInButton: 'Authenticate & Enter Portal',
-      signingIn: 'Verifying Credentials...',
-      demoCredentialsTitle: 'Direct Role Authentication',
-      demoInvestorBtn: 'Log In as Investor (Sir Arthur Montgomery)',
-      demoAdminBtn: 'Log In as Admin (Marcus Vance - Compliance Lead)',
-      roleDifferentiatedNotice: 'User roles are strictly differentiated by credentials. Administrative privileges are granted exclusively to verified officer accounts.',
-      signOut: 'Sign Out',
-      signOutConfirm: 'Terminate authenticated session?',
-      loggedOutSuccess: 'Session terminated securely.',
-      loggedInSuccess: 'Authenticated successfully.',
-      invalidCredentials: 'Authentication failed. Please verify your institutional credentials.',
-      adminRequiredMessage: 'Administrative role required to access this console.'
+export const defaultEnPageTranslations: PageTranslations = {
+  auth: {
+    signIn: 'Client Sign In',
+    clientAccess: 'Portal Access',
+    investorTab: 'Investor Portal',
+    adminTab: 'Compliance & Admin',
+    investorTitle: 'Private Wealth Portal',
+    investorDesc: 'Access segregated custody, active yield allocations, and audited ledger accounts.',
+    adminTitle: 'Depository Admin Console',
+    adminDesc: 'Restricted to authorized compliance, treasury, and custody clearing officers.',
+    emailLabel: 'Authorized Email',
+    passwordLabel: 'Cryptographic Credential / Password',
+    twoFaBadge: 'Hardware 2FA / TOTP Protected',
+    rememberMe: 'Remember terminal session',
+    forgotPassword: 'Reset via custody desk',
+    signInButton: 'Authenticate & Enter Portal',
+    signingIn: 'Verifying Credentials...',
+    demoCredentialsTitle: 'Direct Role Authentication',
+    demoInvestorBtn: 'Log In as Investor (Sir Arthur Montgomery)',
+    demoAdminBtn: 'Log In as Admin (Marcus Vance - Compliance Lead)',
+    roleDifferentiatedNotice: 'User roles are strictly differentiated by credentials. Administrative privileges are granted exclusively to verified officer accounts.',
+    signOut: 'Sign Out',
+    signOutConfirm: 'Terminate authenticated session?',
+    loggedOutSuccess: 'Session terminated securely.',
+    loggedInSuccess: 'Authenticated successfully.',
+    invalidCredentials: 'Authentication failed. Please verify your institutional credentials.',
+    adminRequiredMessage: 'Administrative role required to access this console.'
+  },
+  adminGuard: {
+    accessDeniedTitle: 'Administrative Clearance Required',
+    clearanceRequired: 'Access to the TradeVerge Admin Console is restricted exclusively to authorized Treasury and Compliance officers.',
+    securityProtocolNotice: 'All unauthorized access attempts are logged with timestamp, cryptographic fingerprint, and IP origin in immutable audit logs.',
+    signInAsAdmin: 'Sign In with Admin Credentials',
+    returnToInvestorPortal: 'Return to Investor Portal'
+  },
+  publicPages: {
+    howItWorksTitle: 'Institutional Custody Architecture',
+    howItWorksSubtitle: 'How TradeVerge safeguards high-net-worth capital with automated ledger reconciliation and audited reserves.',
+    pricingTitle: 'Transparent Fee Schedule',
+    pricingSubtitle: 'Institutional cost structure with zero hidden spread markups or management fees.',
+    securityTitle: 'Security & Custodial Reserves',
+    securitySubtitle: 'Multi-layered cold storage, segregated bank depositories, and cryptographic proof of reserves.',
+    educationTitle: 'Institutional Knowledge & Research',
+    educationSubtitle: 'In-depth market briefs, multi-asset allocation strategies, and macroeconomic analysis.',
+    aboutTitle: 'About TradeVerge Private Wealth',
+    aboutSubtitle: 'A specialized private asset depository engineered for family offices, trusts, and accredited investors.',
+    contactTitle: 'Direct Institutional Inquiries',
+    contactSubtitle: 'Connect with our Zurich and New York private wealth desks for personalized custody onboarding.',
+    legalTitle: 'Regulatory Disclosures & Terms',
+    legalSubtitle: 'Comprehensive legal documentation, compliance frameworks, and investor protections.',
+    tier1Custody: 'Tier-1 Segregated Depository',
+    segregatedReserves: '100% Verifiable Asset Reserves',
+    auditedLedger: 'Cryptographically Verifiable Ledger',
+    regulatoryCompliance: 'Global AML/KYC & FinMA Standards',
+    marketplace: {
+      badge: 'Institutional Capital Market',
+      title: 'Investment Vehicles & Strategies',
+      subtitle: 'Deterministic structured yield opportunities vetted by the Investment Committee with segregated asset isolation.',
+      searchPlaceholder: 'Search strategy name, code, or asset class...',
+      allocateButton: 'Allocate Capital'
     },
-    adminGuard: {
-      accessDeniedTitle: 'Administrative Clearance Required',
-      clearanceRequired: 'Access to the TradeVerge Admin Console is restricted exclusively to authorized Treasury and Compliance officers.',
-      securityProtocolNotice: 'All unauthorized access attempts are logged with timestamp, cryptographic fingerprint, and IP origin in immutable audit logs.',
-      signInAsAdmin: 'Sign In with Admin Credentials',
-      returnToInvestorPortal: 'Return to Investor Portal'
+    howItWorks: {
+      badge: 'Lifecycle Overview',
+      title: 'End-to-End Custody & Yield Mechanics',
+      subtitle: 'From depository wire clearing to deterministic yield accrual: an audited 11-step fiduciary pipeline.',
+      steps: [
+        { step: '01', title: 'Institutional Onboarding & KYC Clearance', desc: 'Accredited investors undergo AML/CFT verification and passport validation.' },
+        { step: '02', title: 'Segregated Depository Provisioning', desc: 'Each client receives an isolated off-balance-sheet depository sub-ledger.' },
+        { step: '03', title: 'Multi-Currency Capital Inflow', desc: 'Wires and multi-chain digital assets clear through Tier-1 banking partners.' },
+        { step: '04', title: 'Double-Entry Reconciliation', desc: 'Inflows are atomically verified and booked by custody clearing controllers.' },
+        { step: '05', title: 'Strategy Selection & Mandate Allocation', desc: 'Deploy liquid capital into audited quantitative and fixed-income portfolios.' },
+        { step: '06', title: 'Smart Asset Isolation', desc: 'Allocated assets remain in cold MPC storage with multi-sig governance.' },
+        { step: '07', title: 'Continuous Yield Accrual', desc: 'Daily deterministic profit compounding calculated down to the second.' },
+        { step: '08', title: 'Real-Time Attestation', desc: 'Live cryptographic proof of reserves updated continuously on-chain.' },
+        { step: '09', title: 'Quarterly Audit Certification', desc: 'Independent Big-4 CPA firms audit balance sheets and asset backing.' },
+        { step: '10', title: 'Flexible Capital Redemption', desc: 'Initiate principal or yield withdrawals with guaranteed 24h settlement.' },
+        { step: '11', title: 'Comprehensive Tax & Fiscal Reporting', desc: 'One-click export of audited annual statements and withholding tax forms.' }
+      ],
+      securityBadge: 'Zero Counterparty Risk',
+      securityTitle: 'Bank-Grade Depository Protection',
+      securitySubtitle: 'Assets are never commingled or rehypothecated for speculative proprietary trading.',
+      securityPoints: [
+        '100% 1:1 asset backing in cold vaults',
+        'Tier-1 Swiss & US banking relationships',
+        'Full FinMA & SEC compliant frameworks',
+        'Comprehensive Lloyd’s of London insurance'
+      ],
+      ctaTitle: 'Ready to Deploy Institutional Capital?',
+      ctaDesc: 'Begin with verified depository onboarding and access institutional-grade yield.',
+      ctaButton: 'Open Private Wealth Account',
+      explorePlansButton: 'Explore All Strategies'
     },
-    publicPages: {
-      howItWorksTitle: 'Institutional Custody Architecture',
-      howItWorksSubtitle: 'How TradeVerge safeguards high-net-worth capital with automated ledger reconciliation and audited reserves.',
-      pricingTitle: 'Transparent Fee Schedule',
-      pricingSubtitle: 'Institutional cost structure with zero hidden spread markups or management fees.',
-      securityTitle: 'Security & Custodial Reserves',
-      securitySubtitle: 'Multi-layered cold storage, segregated bank depositories, and cryptographic proof of reserves.',
-      educationTitle: 'Institutional Knowledge & Research',
-      educationSubtitle: 'In-depth market briefs, multi-asset allocation strategies, and macroeconomic analysis.',
-      aboutTitle: 'About TradeVerge Private Wealth',
-      aboutSubtitle: 'A specialized private asset depository engineered for family offices, trusts, and accredited investors.',
-      contactTitle: 'Direct Institutional Inquiries',
-      contactSubtitle: 'Connect with our Zurich and New York private wealth desks for personalized custody onboarding.',
-      legalTitle: 'Regulatory Disclosures & Terms',
-      legalSubtitle: 'Comprehensive legal documentation, compliance frameworks, and investor protections.',
-      tier1Custody: 'Tier-1 Segregated Depository',
-      segregatedReserves: '100% Verifiable Asset Reserves',
-      auditedLedger: 'Cryptographically Verifiable Ledger',
-      regulatoryCompliance: 'Global AML/KYC & FinMA Standards'
+    pricing: {
+      badge: 'Transparent Cost Schedule',
+      title: 'Zero Hidden Spread. Pure Institutional Pricing.',
+      subtitle: 'Depository inflows are free of charge. Management is strictly performance-aligned.',
+      cardInflowsTag: 'Depository Inflows',
+      cardInflowsTitle: 'Capital Deposits',
+      cardInflowsFeeLabel: 'Free of depository charge',
+      cardInflowsFeatures: [
+        'Free SWIFT & Fedwire bank transfers',
+        'Zero gas markup on BTC / ETH / USDT / USDC',
+        'Instant double-entry ledger settlement',
+        'No monthly account maintenance fee'
+      ],
+      cardInflowsCta: 'Fund Depository Account',
+      cardCustodyTag: 'Custody & Yield',
+      cardCustodyTitle: 'Active Allocation',
+      cardCustodyFeeLabel: 'Annualized management fee',
+      cardCustodyFeatures: [
+        'Institutional cold storage & insurance',
+        'Deterministic yield compounding',
+        'Continuous proof of reserves attestation',
+        'Audited tax statements included'
+      ],
+      cardCustodyCta: 'Explore Strategies',
+      cardRedemptionTag: 'Capital Redemptions',
+      cardRedemptionTitle: 'Withdrawals & Clearing',
+      cardRedemptionFeeLabel: 'Flat processing or network fee',
+      cardRedemptionFeatures: [
+        'Standard 24h bank wire processing',
+        'Exact on-chain network gas pass-through',
+        'No early redemption penalties on liquid tiers',
+        'Multi-signature hardware 2FA release'
+      ],
+      cardRedemptionCta: 'Review Security Controls'
     },
-    investorPages: {
-      transactionsTitle: 'Audited Ledger Journal',
-      transactionsSubtitle: 'Real-time chronological record of all cleared deposits, disbursements, and deterministic yield postings.',
-      documentsTitle: 'Custody Statements & Tax Reports',
-      documentsSubtitle: 'Download official auditor confirmations, monthly wealth statements, and fiscal tax certificates.',
-      profileTitle: 'Institutional Profile & Security',
-      profileSubtitle: 'Manage authenticated identity, hardware 2FA keys, trusted whitelisted addresses, and audit sessions.',
-      exportCsv: 'Export Journal CSV',
-      filterAll: 'All Records',
-      filterDeposits: 'Cleared Deposits',
-      filterWithdrawals: 'Disbursements',
-      filterYield: 'Accrued Yield',
-      filterInvestments: 'Capital Allocations',
-      twoFaStatus: 'Two-Factor Authentication (2FA)',
-      kycTierLevel: 'KYC Clearance Tier',
-      accountSecurity: 'Cryptographic Security & API Keys'
+    security: {
+      badge: 'Fiduciary Defense Framework',
+      title: 'Military-Grade Vault Security & Asset Isolation',
+      subtitle: 'How TradeVerge safeguards client assets with multi-signature cold storage and institutional custody.',
+      cards: [
+        { title: 'Multi-Party Computation (MPC)', desc: 'Private keys are fragmented into cryptographic mathematical shards across disparate sovereign jurisdictions, eliminating single points of compromise.' },
+        { title: 'Segregated Depository Accounts', desc: 'All client funds are held strictly off-balance-sheet in segregated accounts at Tier-1 Swiss and American financial institutions.' },
+        { title: 'Cryptographic Proof of Reserves', desc: 'Continuous on-chain Merkle tree attestations enable real-time independent verification of our 1:1 asset backing without exposing private client metadata.' },
+        { title: '24/7 AI-Augmented Anomaly Detection', desc: 'Algorithmic pattern monitors scan every transaction in real-time for anomalous routing, velocity spikes, or address inconsistencies before clearing.' }
+      ]
     },
-    footer: {
-      tagline: 'Institutional Digital Asset Custody & Private Wealth Ledger',
-      regulatoryNotice: 'TradeVerge operates under strict institutional custody protocols with segregated cash reserves and cryptographic multi-signature asset vaults.',
-      riskDisclaimer: 'Digital assets and structured yield vehicles carry financial market risk. Past performance does not guarantee future results. Segregated reserves are audited continuously.',
-      copyright: '© 2026 TradeVerge Private Wealth Ltd. All rights reserved.',
-      quickLinks: 'Marketplace & Portals',
-      legalLinks: 'Compliance & Governance',
-      institutionalServices: 'Custodial Depository'
+    education: {
+      badge: 'Institutional Research Desk',
+      title: 'Market Intelligence & Sovereign Wealth Analysis',
+      subtitle: 'Exclusive briefings, macroeconomic perspectives, and quantitative research compiled by our investment committee.',
+      articles: [
+        { title: 'Yield Generation in Digital Debt Markets', category: 'Fixed Income', readTime: '6 min read', desc: 'An examination of tokenized short-term treasuries and collateralized institutional liquidity protocols.' },
+        { title: 'Custodial Risk Mitigation for Family Offices', category: 'Risk Management', readTime: '8 min read', desc: 'Strategic frameworks for evaluating counterparty risk, MPC vaults, and multi-jurisdictional asset protection.' },
+        { title: 'Macro Trends: Institutional Digital Asset Inflows', category: 'Macro Brief', readTime: '5 min read', desc: 'Analyzing the accelerating migration of sovereign capital into transparent, deterministic yield vehicles.' },
+        { title: 'Tax Structuring for Cross-Border Digital Yield', category: 'Wealth Advisory', readTime: '10 min read', desc: 'A legal guide to international withholding treaties, CRS reporting, and digital asset accounting standards.' }
+      ]
+    },
+    about: {
+      badge: 'Corporate Heritage & Governance',
+      title: 'Pioneering Institutional Digital Asset Custody',
+      subtitle: 'TradeVerge was founded to bridge the rigorous standards of Swiss private banking with modern blockchain architecture.',
+      pillars: [
+        { title: 'Fiduciary Integrity', desc: 'We act strictly as a custodian and fiduciary. We never speculate with client assets, trade against our users, or engage in uncollateralized lending.' },
+        { title: 'Regulatory Rigor', desc: 'Operating within established Swiss FinMA standards and global AML/KYC directives, ensuring total peace of mind for accredited institutions.' },
+        { title: 'Technological Excellence', desc: 'Engineered from the ground up on high-frequency, double-entry ledger mechanics with cryptographic verification at every lifecycle phase.' }
+      ]
+    },
+    contact: {
+      badge: 'Global Wealth Advisory Desks',
+      title: 'Direct Institutional Communications',
+      subtitle: 'Connect with our private wealth advisors in Zurich, New York, London, or Singapore for custom onboarding.',
+      formTitle: 'Submit an Institutional Inquiry',
+      formSubtitle: 'A senior wealth director will respond within 4 hours during market trading sessions.',
+      labelName: 'Full Name / Entity Name',
+      labelEmail: 'Institutional Email',
+      labelCategory: 'Inquiry Category',
+      labelSubject: 'Subject / Reference',
+      labelMessage: 'Detailed Message',
+      submitButton: 'Dispatch Inquiry to Advisory Desk',
+      globalOffices: 'Our Global Presence'
+    },
+    legal: {
+      badge: 'Regulatory Framework',
+      title: 'Terms of Custody & Disclosures',
+      lastUpdated: 'Effective Date: September 2026 • Document Version: 4.8-FINMA',
+      tabs: {
+        terms: 'Terms of Depository Service',
+        privacy: 'Privacy & Data Governance',
+        aml: 'Global AML & KYC Mandate',
+        risk: 'Financial Risk & Reserve Attestation'
+      }
     }
   },
-  es: {
-    auth: {
-      signIn: 'Iniciar Sesión',
-      clientAccess: 'Acceso a Portal',
-      investorTab: 'Portal de Inversores',
-      adminTab: 'Cumplimiento y Admin',
-      investorTitle: 'Portal de Patrimonio Privado',
-      investorDesc: 'Acceda a custodia segregada, rendimientos activos y cuentas de libro mayor auditadas.',
-      adminTitle: 'Consola de Administración Depositaria',
-      adminDesc: 'Restringido a oficiales autorizados de cumplimiento, tesorería y liquidación.',
-      emailLabel: 'Correo Electrónico Autorizado',
-      passwordLabel: 'Credencial Criptográfica / Contraseña',
-      twoFaBadge: 'Protegido con 2FA / TOTP',
-      rememberMe: 'Recordar sesión de terminal',
-      forgotPassword: 'Restablecer vía mesa de custodia',
-      signInButton: 'Autenticar y Entrar al Portal',
-      signingIn: 'Verificando Credenciales...',
-      demoCredentialsTitle: 'Autenticación Directa por Rol',
-      demoInvestorBtn: 'Entrar como Inversor (Sir Arthur Montgomery)',
-      demoAdminBtn: 'Entrar como Admin (Marcus Vance - Cumplimiento)',
-      roleDifferentiatedNotice: 'Los roles se diferencian estrictamente por credenciales. Los privilegios de administrador se otorgan exclusivamente a cuentas verificadas de oficiales.',
-      signOut: 'Cerrar Sesión',
-      signOutConfirm: '¿Desea finalizar la sesión autenticada?',
-      loggedOutSuccess: 'Sesión finalizada de forma segura.',
-      loggedInSuccess: 'Autenticado con éxito.',
-      invalidCredentials: 'Autenticación fallida. Verifique sus credenciales institucionales.',
-      adminRequiredMessage: 'Se requiere rol administrativo para acceder a esta consola.'
+  investorPages: {
+    transactionsTitle: 'Audited Ledger Journal',
+    transactionsSubtitle: 'Real-time chronological record of all cleared deposits, disbursements, and deterministic yield postings.',
+    documentsTitle: 'Custody Statements & Tax Reports',
+    documentsSubtitle: 'Download official auditor confirmations, monthly wealth statements, and fiscal tax certificates.',
+    profileTitle: 'Institutional Profile & Security',
+    profileSubtitle: 'Manage authenticated identity, hardware 2FA keys, trusted whitelisted addresses, and audit sessions.',
+    exportCsv: 'Export Journal CSV',
+    filterAll: 'All Records',
+    filterDeposits: 'Cleared Deposits',
+    filterWithdrawals: 'Disbursements',
+    filterYield: 'Accrued Yield',
+    filterInvestments: 'Capital Allocations',
+    twoFaStatus: 'Two-Factor Authentication (2FA)',
+    kycTierLevel: 'KYC Clearance Tier',
+    accountSecurity: 'Cryptographic Security & API Keys',
+    transactions: {
+      badge: 'Immutable Accounting Ledger',
+      title: 'Transaction Journal',
+      subtitle: 'Authoritative, balanced double-entry record of depository entries, allocations, and yield distributions.',
+      exportCsv: 'Export Ledger CSV',
+      searchPlaceholder: 'Search Journal ID, Ref, or Desc...',
+      colEntry: 'Journal Entry',
+      colType: 'Type',
+      colDescription: 'Description',
+      colAmount: 'Amount',
+      colTimestamp: 'Timestamp',
+      colStatus: 'Status',
+      colAction: 'Certificate'
     },
-    adminGuard: {
-      accessDeniedTitle: 'Autorización Administrativa Requerida',
-      clearanceRequired: 'El acceso a la consola de administración de TradeVerge está restringido exclusivamente a oficiales de tesorería y cumplimiento.',
-      securityProtocolNotice: 'Todo intento de acceso no autorizado queda registrado con marca temporal, huella criptográfica e IP en registros inmutables.',
-      signInAsAdmin: 'Iniciar Sesión con Credenciales de Admin',
-      returnToInvestorPortal: 'Volver al Portal de Inversores'
+    documents: {
+      badge: 'Compliance & Tax Vault',
+      title: 'Institutional Documents & Certificates',
+      subtitle: 'Cryptographically signed statements, custody certificates, and annual tax attestations.',
+      downloadButton: 'Download PDF'
     },
-    publicPages: {
-      howItWorksTitle: 'Arquitectura de Custodia Institucional',
-      howItWorksSubtitle: 'Cómo TradeVerge protege el capital patrimonial con conciliación automática y reservas auditadas.',
-      pricingTitle: 'Estructura de Tarifas Transparente',
-      pricingSubtitle: 'Costes institucionales sin comisiones ocultas ni sobreprecios de gestión.',
-      securityTitle: 'Seguridad y Reservas Depositarias',
-      securitySubtitle: 'Almacenamiento en frío multicapa, depósitos bancarios segregados y prueba criptográfica de reservas.',
-      educationTitle: 'Investigación y Conocimiento Institucional',
-      educationSubtitle: 'Informes de mercado, estrategias multiactivo y análisis macroeconómico especializado.',
-      aboutTitle: 'Sobre TradeVerge Private Wealth',
-      aboutSubtitle: 'Depositario privado de activos diseñado para family offices, fideicomisos e inversores acreditados.',
-      contactTitle: 'Atención Institucional Directa',
-      contactSubtitle: 'Conecte con nuestras mesas de Zúrich y Nueva York para incorporación personalizada.',
-      legalTitle: 'Marco Regulatorio y Términos',
-      legalSubtitle: 'Documentación legal completa, cumplimiento normativo y salvaguardas para inversores.',
-      tier1Custody: 'Custodia Depositaria Nivel 1',
-      segregatedReserves: 'Reservas de Activos 100% Verificables',
-      auditedLedger: 'Libro Mayor Criptográficamente Verificable',
-      regulatoryCompliance: 'Normas Globales AML/KYC y FinMA'
+    profile: {
+      badge: 'Institutional Identity & Security',
+      title: 'Account Security & Access Controls',
+      subtitle: 'Manage authorized hardware authenticators, compliance credentials, and active terminal sessions.',
+      cardProfile: 'Institutional Entity Profile',
+      card2Fa: 'Hardware Two-Factor Authentication',
+      enable2Fa: 'Enable Authenticator 2FA',
+      activeSessions: 'Active Terminal Sessions'
     },
-    investorPages: {
-      transactionsTitle: 'Diario del Libro Mayor Auditado',
-      transactionsSubtitle: 'Registro cronológico en tiempo real de depósitos liquidados, desembolsos y rendimientos.',
-      documentsTitle: 'Extractos de Custodia e Informes Fiscales',
-      documentsSubtitle: 'Descargue certificados oficiales de auditores, extractos mensuales y certificados tributarios.',
-      profileTitle: 'Perfil Institucional y Seguridad',
-      profileSubtitle: 'Administre identidad verificada, llaves 2FA, direcciones autorizadas y sesiones de auditoría.',
-      exportCsv: 'Exportar CSV del Diario',
-      filterAll: 'Todos los Registros',
-      filterDeposits: 'Depósitos Liquidados',
-      filterWithdrawals: 'Desembolsos',
-      filterYield: 'Rendimientos Devengados',
-      filterInvestments: 'Asignaciones de Capital',
-      twoFaStatus: 'Autenticación de Dos Factores (2FA)',
-      kycTierLevel: 'Nivel de Verificación KYC',
-      accountSecurity: 'Seguridad Criptográfica y Claves API'
-    },
-    footer: {
-      tagline: 'Custodia de Activos Digitales y Libro Mayor de Patrimonio Privado',
-      regulatoryNotice: 'TradeVerge opera bajo estrictos protocolos de custodia institucional con reservas segregadas y bóvedas multifirma.',
-      riskDisclaimer: 'Los activos digitales y vehículos estructurados conllevan riesgo financiero. El rendimiento pasado no garantiza resultados futuros.',
-      copyright: '© 2026 TradeVerge Private Wealth Ltd. Todos los derechos reservados.',
-      quickLinks: 'Mercado y Portales',
-      legalLinks: 'Cumplimiento y Gobernanza',
-      institutionalServices: 'Depositario Custodio'
+    kyc: {
+      badge: 'Compliance & Regulatory Identity',
+      title: 'Tier 2 KYC Verification',
+      submitButton: 'Submit Verification File to Compliance'
     }
   },
-  fr: {
-    auth: {
-      signIn: 'Connexion Client',
-      clientAccess: 'Accès Portail',
-      investorTab: 'Portail Investisseur',
-      adminTab: 'Conformité & Admin',
-      investorTitle: 'Portail Gestion Privée',
-      investorDesc: 'Accédez à la garde ségréguée, aux rendements actifs et aux registres audités.',
-      adminTitle: 'Console Dépositaire Admin',
-      adminDesc: 'Réservé aux officiers agréés de conformité, trésorerie et compensation.',
-      emailLabel: 'Courriel Autorisé',
-      passwordLabel: 'Identifiant Cryptographique / Mot de passe',
-      twoFaBadge: 'Sécurisé par 2FA Matériel / TOTP',
-      rememberMe: 'Mémoriser la session du terminal',
-      forgotPassword: 'Réinitialiser auprès du bureau de garde',
-      signInButton: 'S’authentifier & Accéder au Portail',
-      signingIn: 'Vérification des Identifiants...',
-      demoCredentialsTitle: 'Authentification Directe par Rôle',
-      demoInvestorBtn: 'Connexion Investisseur (Sir Arthur Montgomery)',
-      demoAdminBtn: 'Connexion Admin (Marcus Vance - Conformité)',
-      roleDifferentiatedNotice: 'Les rôles sont strictement différenciés par les identifiants. Les privilèges admin sont réservés aux comptes officiers vérifiés.',
-      signOut: 'Déconnexion',
-      signOutConfirm: 'Mettre fin à la session authentifiée ?',
-      loggedOutSuccess: 'Session terminée en toute sécurité.',
-      loggedInSuccess: 'Authentification réussie.',
-      invalidCredentials: 'Échec de l’authentification. Veuillez vérifier vos identifiants.',
-      adminRequiredMessage: 'Rôle administrateur requis pour cette console.'
+  footer: {
+    segregatedLedgers: 'Segregated Ledgers',
+    segregatedLedgersDesc: 'Double-entry cryptographic ledger reconciliation ensuring 100% asset segregation.',
+    tier1Custody: 'Tier 1 Banking Custody',
+    tier1CustodyDesc: 'Cash reserves held in segregated depository accounts with premier global institutions.',
+    deterministicExecution: 'Deterministic Execution',
+    deterministicExecutionDesc: 'Automated contract execution with zero proprietary slippage or commingling.',
+    continuousSettlement: 'Continuous Settlement',
+    continuousSettlementDesc: 'Near-instant internal clearing with audited cryptographic transaction proofs.',
+    brandDesc: 'TradeVerge Private Wealth is an institutional digital asset depository and investment management platform providing deterministic structured yield for accredited entities and family offices.',
+    colInvestments: 'Investment Vehicles',
+    colPlatform: 'Platform & Security',
+    colPortals: 'Client Portals',
+    disclaimerTitle: 'Regulatory Status & Financial Risk Notice',
+    disclaimerBody: 'TradeVerge Private Wealth operates under institutional custody and compliance protocols. Structured yield vehicles and digital assets carry market risk. Past performance does not guarantee future results. Deposited funds are held in segregated, audited accounts.',
+    tagline: 'Institutional Digital Asset Custody & Private Wealth Ledger',
+    regulatoryNotice: 'TradeVerge operates under strict institutional custody protocols with segregated cash reserves and cryptographic multi-signature asset vaults.',
+    riskDisclaimer: 'Digital assets and structured yield vehicles carry financial market risk. Past performance does not guarantee future results. Segregated reserves are audited continuously.',
+    copyright: '© 2026 TradeVerge Private Wealth Ltd. All rights reserved.',
+    quickLinks: 'Marketplace & Portals',
+    legalLinks: 'Compliance & Governance',
+    institutionalServices: 'Custodial Depository'
+  }
+};
+
+// Deep merge helper to guarantee no property is ever undefined
+function deepMerge<T>(target: any, source: any): T {
+  const output = { ...target };
+  if (source && typeof source === 'object') {
+    Object.keys(source).forEach(key => {
+      if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key])) {
+        output[key] = deepMerge(target[key] || {}, source[key]);
+      } else if (source[key] !== undefined) {
+        output[key] = source[key];
+      }
+    });
+  }
+  return output;
+}
+
+// Localized overrides for each language
+const esOverrides: Partial<PageTranslations> = {
+  publicPages: {
+    ...defaultEnPageTranslations.publicPages,
+    marketplace: {
+      badge: 'Mercado Institucional de Capitales',
+      title: 'Vehículos y Estrategias de Inversión',
+      subtitle: 'Oportunidades de rendimiento estructurado determinista revisadas por el Comité de Inversiones.',
+      searchPlaceholder: 'Buscar por estrategia, código o clase de activo...',
+      allocateButton: 'Asignar Capital'
     },
-    adminGuard: {
-      accessDeniedTitle: 'Habilitation Administrative Requise',
-      clearanceRequired: 'L’accès à la console d’administration TradeVerge est strictement restreint aux officiers de trésorerie et conformité.',
-      securityProtocolNotice: 'Toute tentative non autorisée est consignée avec horodatage, empreinte cryptographique et adresse IP.',
-      signInAsAdmin: 'Se connecter avec identifiants Admin',
-      returnToInvestorPortal: 'Retourner au Portail Investisseur'
+    howItWorks: {
+      ...defaultEnPageTranslations.publicPages.howItWorks,
+      badge: 'Ciclo de Operaciones',
+      title: 'Mecánica de Custodia y Rendimiento Integral',
+      subtitle: 'Desde la liquidación bancaria hasta la acumulación de rendimiento: un proceso fiduciario auditado de 11 pasos.',
+      ctaTitle: '¿Listo para Desplegar Capital Institucional?',
+      ctaDesc: 'Comience con incorporación depositaria verificada y acceda a rendimientos institucionales.',
+      ctaButton: 'Abrir Cuenta Privada',
+      explorePlansButton: 'Explorar Estrategias'
     },
-    publicPages: {
-      howItWorksTitle: 'Architecture de Garde Institutionnelle',
-      howItWorksSubtitle: 'Comment TradeVerge sécurise les capitaux avec réconciliation automatisée et réserves vérifiées.',
-      pricingTitle: 'Grille Tarifaire Transparente',
-      pricingSubtitle: 'Structure de coûts institutionnels sans frais cachés ni marges de gestion dissimulées.',
-      securityTitle: 'Sécurité et Réserves Dépositaires',
-      securitySubtitle: 'Stockage à froid multicouche, dépôts bancaires ségrégués et preuve cryptographique de réserves.',
-      educationTitle: 'Recherche et Connaissances Institutionnelles',
-      educationSubtitle: 'Notes de marché, stratégies multi-actifs et analyses macroéconomiques avancées.',
-      aboutTitle: 'À Propos de TradeVerge Private Wealth',
-      aboutSubtitle: 'Dépositaire d’actifs privés conçu pour family offices, fiducies et investisseurs qualifiés.',
-      contactTitle: 'Relations Institutionnelles Directes',
-      contactSubtitle: 'Contactez nos bureaux de Zurich et New York pour un accompagnement sur mesure.',
-      legalTitle: 'Informations Réglementaires et Conditions',
-      legalSubtitle: 'Documentation juridique exhaustive, cadres de conformité et garanties investisseurs.',
-      tier1Custody: 'Garde Dépositaire de Premier Rang',
-      segregatedReserves: '100% de Réserves d’Actifs Vérifiables',
-      auditedLedger: 'Registre Cryptographiquement Contrôlable',
-      regulatoryCompliance: 'Normes Mondiales LBC/FT et FinMA'
+    pricing: {
+      ...defaultEnPageTranslations.publicPages.pricing,
+      badge: 'Estructura de Tarifas Transparente',
+      title: 'Cero Margen Oculto. Precios Institucionales Puros.',
+      subtitle: 'Los ingresos a cuentas depositarias no tienen comisiones. Gestión 100% transparente.',
+      cardInflowsCta: 'Fondear Cuenta Depositaria',
+      cardCustodyCta: 'Explorar Estrategias',
+      cardRedemptionCta: 'Revisar Controles'
     },
-    investorPages: {
-      transactionsTitle: 'Journal du Registre Audité',
-      transactionsSubtitle: 'Historique chronologique en temps réel des dépôts compensés, retraits et rendements.',
-      documentsTitle: 'Relevés de Garde et Rapports Fiscaux',
-      documentsSubtitle: 'Téléchargez les attestations d’auditeurs, relevés mensuels et attestations fiscales officielles.',
-      profileTitle: 'Profil Institutionnel et Sécurité',
-      profileSubtitle: 'Gérez vos identités certifiées, clés 2FA, adresses de retrait autorisées et journaux de session.',
+    security: {
+      ...defaultEnPageTranslations.publicPages.security,
+      badge: 'Marco de Defensa Fiduciario',
+      title: 'Seguridad Militar en Bóvedas y Aislamiento de Activos',
+      subtitle: 'Cómo TradeVerge protege los activos de los clientes con almacenamiento en frío multifirma.'
+    },
+    education: {
+      ...defaultEnPageTranslations.publicPages.education,
+      badge: 'Mesa de Investigación Institucional',
+      title: 'Inteligencia de Mercado y Análisis de Patrimonio',
+      subtitle: 'Informes exclusivos, perspectivas macroeconómicas e investigación cuantitativa.'
+    },
+    about: {
+      ...defaultEnPageTranslations.publicPages.about,
+      badge: 'Patrimonio y Gobernanza Corporativa',
+      title: 'Pioneros en Custodia Institucional de Activos Digitales',
+      subtitle: 'TradeVerge fue fundada para unir los estándares de la banca privada suiza con blockchain.'
+    },
+    contact: {
+      ...defaultEnPageTranslations.publicPages.contact,
+      badge: 'Mesas Globales de Asesoría Patrimonial',
+      title: 'Comunicaciones Institucionales Directas',
+      subtitle: 'Conéctese con nuestros asesores en Zúrich, Nueva York, Londres o Singapur.'
+    },
+    legal: {
+      ...defaultEnPageTranslations.publicPages.legal,
+      badge: 'Marco Regulatorio',
+      title: 'Términos de Custodia y Divulgaciones'
+    }
+  },
+  investorPages: {
+    ...defaultEnPageTranslations.investorPages,
+    transactions: {
+      badge: 'Libro Mayor Contable Inmutable',
+      title: 'Diario de Transacciones',
+      subtitle: 'Registro autorizado de partida doble de entradas de custodia, asignaciones y rendimientos.',
+      exportCsv: 'Exportar Libro Mayor CSV',
+      searchPlaceholder: 'Buscar ID de Diario, Ref o Descripción...',
+      colEntry: 'Entrada del Diario',
+      colType: 'Tipo',
+      colDescription: 'Descripción',
+      colAmount: 'Monto',
+      colTimestamp: 'Fecha y Hora',
+      colStatus: 'Estado',
+      colAction: 'Certificado'
+    },
+    documents: {
+      badge: 'Bóveda de Cumplimiento y Fiscalidad',
+      title: 'Documentos Institucionales y Certificados',
+      subtitle: 'Extractos firmados criptográficamente, certificados de custodia e informes fiscales anuales.',
+      downloadButton: 'Descargar PDF'
+    },
+    profile: {
+      badge: 'Identidad Institucional y Seguridad',
+      title: 'Seguridad de la Cuenta y Control de Acceso',
+      subtitle: 'Administre autenticadores de hardware, credenciales de cumplimiento y sesiones activas.',
+      cardProfile: 'Perfil de Entidad Institucional',
+      card2Fa: 'Autenticación 2FA de Hardware',
+      enable2Fa: 'Activar Autenticador 2FA',
+      activeSessions: 'Sesiones de Terminal Activas'
+    },
+    kyc: {
+      badge: 'Identidad Regulatoria y Cumplimiento',
+      title: 'Verificación KYC Nivel 2',
+      submitButton: 'Enviar Expediente a Cumplimiento'
+    }
+  },
+  footer: {
+    ...defaultEnPageTranslations.footer,
+    segregatedLedgers: 'Libros Mayores Segregados',
+    tier1Custody: 'Custodia Bancaria Nivel 1',
+    deterministicExecution: 'Ejecución Determinista',
+    continuousSettlement: 'Liquidación Continua'
+  }
+};
+
+const frOverrides: Partial<PageTranslations> = {
+  publicPages: {
+    ...defaultEnPageTranslations.publicPages,
+    marketplace: {
+      badge: 'Marché des Capitaux Institutionnels',
+      title: 'Véhicules et Stratégies d’Investissement',
+      subtitle: 'Opportunités de rendement déterministe validées par le Comité d’Investissement.',
+      searchPlaceholder: 'Rechercher par stratégie, code ou classe d’actifs...',
+      allocateButton: 'Allouer du Capital'
+    },
+    howItWorks: {
+      ...defaultEnPageTranslations.publicPages.howItWorks,
+      badge: 'Aperçu du Cycle de Vie',
+      title: 'Mécanismes de Garde et de Rendement de Bout en Bout',
+      subtitle: 'De la compensation des dépôts bancaires au calcul continu des rendements : un pipeline audité en 11 étapes.',
+      ctaTitle: 'Prêt à Déployer du Capital Institutionnel ?',
+      ctaDesc: 'Commencez dès aujourd’hui avec une intégration dépositaire vérifiée.',
+      ctaButton: 'Ouvrir un Compte Privé',
+      explorePlansButton: 'Explorer les Stratégies'
+    },
+    pricing: {
+      ...defaultEnPageTranslations.publicPages.pricing,
+      badge: 'Barème Transparent',
+      title: 'Zéro Marge Cachée. Tarification Institutionnelle Pure.',
+      subtitle: 'Les dépôts sont totalement exempts de frais dépositaires.',
+      cardInflowsCta: 'Alimenter le Compte',
+      cardCustodyCta: 'Découvrir les Stratégies',
+      cardRedemptionCta: 'Consulter la Sécurité'
+    },
+    security: {
+      ...defaultEnPageTranslations.publicPages.security,
+      badge: 'Cadre de Défense Fiduciaire',
+      title: 'Sécurité de Coffre-Fort et Ségrégation des Actifs',
+      subtitle: 'Comment TradeVerge protège les actifs avec un stockage à froid multi-signatures.'
+    },
+    education: {
+      ...defaultEnPageTranslations.publicPages.education,
+      badge: 'Pôle Recherche Institutionnelle',
+      title: 'Veille de Marché et Analyse de Gestion Privée',
+      subtitle: 'Notes exclusives, perspectives macroéconomiques et recherches quantitatives.'
+    },
+    about: {
+      ...defaultEnPageTranslations.publicPages.about,
+      badge: 'Héritage et Gouvernance',
+      title: 'Pionniers de la Garde d’Actifs Numériques',
+      subtitle: 'Fondé pour marier la rigueur de la banque privée suisse aux technologies blockchain.'
+    },
+    contact: {
+      ...defaultEnPageTranslations.publicPages.contact,
+      badge: 'Bureaux Mondiaux de Conseil',
+      title: 'Relations Institutionnelles Directes',
+      subtitle: 'Échangez avec nos conseillers à Zurich, New York, Londres ou Singapour.'
+    }
+  },
+  investorPages: {
+    ...defaultEnPageTranslations.investorPages,
+    transactions: {
+      badge: 'Registre Comptable Immuable',
+      title: 'Journal des Transactions',
+      subtitle: 'Enregistrement officiel en partie double des entrées de dépôts, allocations et rendements.',
       exportCsv: 'Exporter le Journal CSV',
-      filterAll: 'Toutes les Lignes',
-      filterDeposits: 'Dépôts Compensés',
-      filterWithdrawals: 'Retraits',
-      filterYield: 'Rendements Cumulés',
-      filterInvestments: 'Allocations de Capital',
-      twoFaStatus: 'Authentification à Deux Facteurs (2FA)',
-      kycTierLevel: 'Niveau d’Accréditation KYC',
-      accountSecurity: 'Sécurité Cryptographique et Clés API'
+      searchPlaceholder: 'Rechercher par ID, Réf ou Description...',
+      colEntry: 'Écriture du Journal',
+      colType: 'Type',
+      colDescription: 'Description',
+      colAmount: 'Montant',
+      colTimestamp: 'Date et Heure',
+      colStatus: 'Statut',
+      colAction: 'Attestation'
     },
-    footer: {
-      tagline: 'Garde d’Actifs Numériques et Registre de Gestion Privée',
-      regulatoryNotice: 'TradeVerge opère selon des protocoles stricts de conservation avec réserves ségréguées et coffres multi-signatures.',
-      riskDisclaimer: 'Les actifs numériques et véhicules structurés comportent des risques financiers. Les performances passées ne préjugent pas des résultats futurs.',
-      copyright: '© 2026 TradeVerge Private Wealth Ltd. Tous droits réservés.',
-      quickLinks: 'Marché et Portails',
-      legalLinks: 'Conformité et Gouvernance',
-      institutionalServices: 'Dépositaire de Garde'
+    documents: {
+      badge: 'Coffre de Conformité et Fiscalité',
+      title: 'Documents Institutionnels et Certificats',
+      subtitle: 'Relevés signés cryptographiquement, certificats de garde et attestations fiscales annuelles.',
+      downloadButton: 'Télécharger le PDF'
+    },
+    profile: {
+      badge: 'Identité Institutionnelle et Sécurité',
+      title: 'Sécurité du Compte et Contrôles d’Accès',
+      subtitle: 'Gérez vos clés 2FA matérielles, identifiants certifiés et sessions de terminal.',
+      cardProfile: 'Profil d’Entité Institutionnelle',
+      card2Fa: 'Authentification 2FA Matérielle',
+      enable2Fa: 'Activer le 2FA Authenticator',
+      activeSessions: 'Sessions de Terminal Actives'
+    },
+    kyc: {
+      badge: 'Identité Réglementaire et Conformité',
+      title: 'Vérification KYC Niveau 2',
+      submitButton: 'Transmettre le Dossier à la Conformité'
     }
   },
-  de: {
-    auth: {
-      signIn: 'Kundenanmeldung',
-      clientAccess: 'Portal-Zugang',
-      investorTab: 'Investorenportal',
-      adminTab: 'Compliance & Admin',
-      investorTitle: 'Private-Wealth-Portal',
-      investorDesc: 'Zugang zu getrennter Verwahrung, aktiven Ertragsstrategien und geprüften Hauptbüchern.',
-      adminTitle: 'Verwahrstellen-Admin-Konsole',
-      adminDesc: 'Ausschließlich für autorisierte Compliance-, Treasury- und Clearing-Offiziere.',
-      emailLabel: 'Autorisierte E-Mail',
-      passwordLabel: 'Kryptografischer Schlüssel / Passwort',
-      twoFaBadge: 'Hardware 2FA / TOTP geschützt',
-      rememberMe: 'Terminal-Sitzung speichern',
-      forgotPassword: 'Über Custody-Desk zurücksetzen',
-      signInButton: 'Authentifizieren & Portal betreten',
-      signingIn: 'Anmeldedaten werden überprüft...',
-      demoCredentialsTitle: 'Direkte Rollen-Authentifizierung',
-      demoInvestorBtn: 'Als Investor anmelden (Sir Arthur Montgomery)',
-      demoAdminBtn: 'Als Admin anmelden (Marcus Vance - Compliance Lead)',
-      roleDifferentiatedNotice: 'Benutzerrollen werden strikt über Anmeldedaten differenziert. Admin-Rechte verbleiben ausschließlich bei verifizierten Beauftragten.',
-      signOut: 'Abmelden',
-      signOutConfirm: 'Authentifizierte Sitzung beenden?',
-      loggedOutSuccess: 'Sitzung sicher beendet.',
-      loggedInSuccess: 'Erfolgreich angemeldet.',
-      invalidCredentials: 'Authentifizierung fehlgeschlagen. Bitte Anmeldedaten prüfen.',
-      adminRequiredMessage: 'Administratorrolle erforderlich.'
+  footer: {
+    ...defaultEnPageTranslations.footer,
+    segregatedLedgers: 'Registres Ségrégués',
+    tier1Custody: 'Garde Bancaire Rang 1',
+    deterministicExecution: 'Exécution Déterministe',
+    continuousSettlement: 'Règlement Continu'
+  }
+};
+
+const deOverrides: Partial<PageTranslations> = {
+  publicPages: {
+    ...defaultEnPageTranslations.publicPages,
+    marketplace: {
+      badge: 'Institutioneller Kapitalmarkt',
+      title: 'Anlagevehikel & Strategien',
+      subtitle: 'Deterministische Ertragschancen mit getrennter Vermögensverwahrung.',
+      searchPlaceholder: 'Strategie, Code oder Anlageklasse suchen...',
+      allocateButton: 'Kapital Allokieren'
     },
-    adminGuard: {
-      accessDeniedTitle: 'Administrative Freigabe Erforderlich',
-      clearanceRequired: 'Der Zugang zur TradeVerge Admin-Konsole ist autorisierten Treasury- und Compliance-Offizieren vorbehalten.',
-      securityProtocolNotice: 'Jeder unberechtigte Zugriffsversuch wird mit Zeitstempel, kryptografischem Fingerabdruck und IP unwiderruflich protokolliert.',
-      signInAsAdmin: 'Mit Administrator-Daten anmelden',
-      returnToInvestorPortal: 'Zurück zum Investorenportal'
-    },
-    publicPages: {
-      howItWorksTitle: 'Institutionelle Verwahrungsarchitektur',
-      howItWorksSubtitle: 'Wie TradeVerge Vermögen mit automatisierter Buchungsabstimmung und geprüften Reserven schützt.',
-      pricingTitle: 'Transparente Gebührenordnung',
-      pricingSubtitle: 'Institutionelle Kostenstruktur ohne versteckte Margen oder Verwaltungsaufschläge.',
-      securityTitle: 'Sicherheit & Verwahrstellenreserven',
-      securitySubtitle: 'Mehrstufige Cold-Storage-Tresore, getrennte Bankkonten und kryptografischer Reservenachweis.',
-      educationTitle: 'Institutionelle Forschung & Analysen',
-      educationSubtitle: 'Marktberichte, Multi-Asset-Allokationen und makroökonomische Analysen.',
-      aboutTitle: 'Über TradeVerge Private Wealth',
-      aboutSubtitle: 'Spezialisierte Vermögensverwahrstelle für Family Offices, Trusts und institutionelle Investoren.',
-      contactTitle: 'Direkte Institutionelle Anfragen',
-      contactSubtitle: 'Kontaktieren Sie unsere Zürcher und New Yorker Desks für eine persönliche Betreuung.',
-      legalTitle: 'Regulatorische Offenlegungen',
-      legalSubtitle: 'Umfassende rechtliche Dokumentation, Compliance-Richtlinien und Anlegerschutz.',
-      tier1Custody: 'Tier-1 Verwahrstellenschutz',
-      segregatedReserves: '100% verifizierbare Vermögensreserven',
-      auditedLedger: 'Kryptografisch überprüfbares Hauptbuch',
-      regulatoryCompliance: 'Globale AML/KYC & FinMA Standards'
-    },
-    investorPages: {
-      transactionsTitle: 'Geprüftes Buchungsjournal',
-      transactionsSubtitle: 'Echtzeit-Chronik aller abgerechneten Einzahlungen, Auszahlungen und Zinsgutschriften.',
-      documentsTitle: 'Depotauszüge & Steuerberichte',
-      documentsSubtitle: 'Offizielle Prüfbestätigungen, monatliche Vermögensberichte und Steuerzertifikate herunterladen.',
-      profileTitle: 'Institutionelles Profil & Sicherheit',
-      profileSubtitle: 'Verifizierte Identität, 2FA-Schlüssel, Whitelist-Adressen und Sitzungsüberwachung verwalten.',
-      exportCsv: 'Journal als CSV exportieren',
-      filterAll: 'Alle Buchungen',
-      filterDeposits: 'Bestätigte Einzahlungen',
-      filterWithdrawals: 'Auszahlungen',
-      filterYield: 'Ertragsgutschriften',
-      filterInvestments: 'Kapitalallokationen',
-      twoFaStatus: 'Zwei-Faktor-Authentifizierung (2FA)',
-      kycTierLevel: 'KYC-Prüfstufe',
-      accountSecurity: 'Kryptografische Sicherheit & API-Schlüssel'
-    },
-    footer: {
-      tagline: 'Institutionelle Verwahrung digitaler Vermögenswerte & Private Wealth Ledger',
-      regulatoryNotice: 'TradeVerge arbeitet nach strengen institutionellen Verwahrstandards mit getrennten Bargeldreserven und Multi-Signatur-Tresoren.',
-      riskDisclaimer: 'Digitale Vermögenswerte und strukturierte Produkte unterliegen Marktrisiken. Die Wertentwicklung der Vergangenheit ist keine Garantie für die Zukunft.',
-      copyright: '© 2026 TradeVerge Private Wealth Ltd. Alle Rechte vorbehalten.',
-      quickLinks: 'Marktplatz & Portale',
-      legalLinks: 'Compliance & Governance',
-      institutionalServices: 'Depotbank-Dienste'
+    howItWorks: {
+      ...defaultEnPageTranslations.publicPages.howItWorks,
+      badge: 'Lebenszyklus-Übersicht',
+      title: 'End-to-End-Verwahrung & Renditemechanik',
+      subtitle: 'Vom Bankclearing bis zur automatischen Zinseszinsberechnung: ein 11-stufiger Prozess.',
+      ctaTitle: 'Bereit für institutionelle Allokationen?',
+      ctaDesc: 'Starten Sie mit geprüfter Verwahrung und greifen Sie auf institutionelle Renditen zu.',
+      ctaButton: 'Konto Eröffnen',
+      explorePlansButton: 'Strategien Erkunden'
     }
   },
-  zh: {
-    auth: {
-      signIn: '客户登录',
-      clientAccess: '门户登录',
-      investorTab: '投资者门户',
-      adminTab: '合规与管理',
-      investorTitle: '私人财富专有门户',
-      investorDesc: '访问独立托管资产、结构化收益策略和经审计的实时账本。',
-      adminTitle: '存管管理中控台',
-      adminDesc: '仅对授权合规官、财务与结算专员开放。',
-      emailLabel: '授权电子邮箱',
-      passwordLabel: '密码 / 认证密钥',
-      twoFaBadge: '支持硬件 2FA / TOTP 双重验证',
-      rememberMe: '记住此终端会话',
-      forgotPassword: '通过托管中心重置',
-      signInButton: '验证并进入门户',
-      signingIn: '凭据验证中...',
-      demoCredentialsTitle: '基于角色的直接验证',
-      demoInvestorBtn: '以投资者身份登录 (Arthur Montgomery)',
-      demoAdminBtn: '以管理员身份登录 (Marcus Vance - 合规负责人)',
-      roleDifferentiatedNotice: '系统通过登录凭证严格区分角色。管理权限仅赋予经过验证的授权人员账户。',
-      signOut: '退出登录',
-      signOutConfirm: '确定退出当前安全会话吗？',
-      loggedOutSuccess: '会话已安全终止。',
-      loggedInSuccess: '验证成功并已登录。',
-      invalidCredentials: '认证失败，请检查您的机构凭据。',
-      adminRequiredMessage: '访问管理后台需要管理员权限。'
+  investorPages: {
+    ...defaultEnPageTranslations.investorPages,
+    transactions: {
+      badge: 'Unveränderliches Hauptbuch',
+      title: 'Transaktionsjournal',
+      subtitle: 'Autorisierter doppischer Buchungsdatensatz für Einlagen, Allokationen und Zinserträge.',
+      exportCsv: 'Hauptbuch als CSV exportieren',
+      searchPlaceholder: 'Journal-ID, Ref oder Beschreibung suchen...',
+      colEntry: 'Journaleintrag',
+      colType: 'Typ',
+      colDescription: 'Beschreibung',
+      colAmount: 'Betrag',
+      colTimestamp: 'Zeitstempel',
+      colStatus: 'Status',
+      colAction: 'Zertifikat'
     },
-    adminGuard: {
-      accessDeniedTitle: '需要管理授权许可',
-      clearanceRequired: 'TradeVerge 管理控制台访问权限仅限授权财务与合规专员。',
-      securityProtocolNotice: '所有未授权访问尝试均会被记录时间戳、加密指纹及 IP 地址至不可篡改日志中。',
-      signInAsAdmin: '使用管理员凭据登录',
-      returnToInvestorPortal: '返回投资者门户'
+    documents: {
+      badge: 'Compliance- & Steuertresor',
+      title: 'Institutionelle Dokumente & Nachweise',
+      subtitle: 'Kryptografisch signierte Abrechnungen, Verwahrungszertifikate und Jahressteuerbescheinigungen.',
+      downloadButton: 'PDF Herunterladen'
     },
-    publicPages: {
-      howItWorksTitle: '机构级资产托管架构',
-      howItWorksSubtitle: 'TradeVerge 如何通过自动化账本对账与审计储备保障高净值资本安全。',
-      pricingTitle: '透明费率体系',
-      pricingSubtitle: '机构级成本标准，无任何隐藏点差或管理费加价。',
-      securityTitle: '安全体系与存管储备',
-      securitySubtitle: '多重冷存储金库、独立银行存管账户以及密码学储备证明。',
-      educationTitle: '机构研究与智库',
-      educationSubtitle: '深度市场简报、多资产配置策略与宏观金融分析。',
-      aboutTitle: '关于 TradeVerge 私人财富',
-      aboutSubtitle: '为家族办公室、信托基金与高净值合资格投资者量身打造的数字资产存管机构。',
-      contactTitle: '直接机构咨询',
-      contactSubtitle: '联系我们在苏黎世和纽约的私人财富服务台获取专属咨询。',
-      legalTitle: '监管披露与条款',
-      legalSubtitle: '全套法律文本、合规框架与投资者保护准则。',
-      tier1Custody: '第一梯队独立存管',
-      segregatedReserves: '100% 可验证资产储备',
-      auditedLedger: '密码学可审计分布式账本',
-      regulatoryCompliance: '符合全球反洗钱与 FinMA 标准'
+    profile: {
+      badge: 'Institutionelle Identität & Sicherheit',
+      title: 'Kontosicherheit & Zugriffskontrollen',
+      subtitle: 'Verwalten Sie Hardware-Authentifikatoren, Compliance-Zugangsdaten und aktive Sitzungen.',
+      cardProfile: 'Institutionelles Unternehmensprofil',
+      card2Fa: 'Hardware-2-Faktor-Authentifizierung',
+      enable2Fa: '2FA-Authenticator Aktivieren',
+      activeSessions: 'Aktive Terminal-Sitzungen'
     },
-    investorPages: {
-      transactionsTitle: '审计账本流水明细',
-      transactionsSubtitle: '已清算入金、出金以及收益记账的实时年代流水记录。',
-      documentsTitle: '存管对账单与税务凭单',
-      documentsSubtitle: '下载官方审计师确认书、月度净值账单及税务证明文件。',
-      profileTitle: '机构资料与安全设置',
-      profileSubtitle: '管理实名认证、硬件 2FA 密钥、安全白名单地址及审计会话。',
-      exportCsv: '导出流水 CSV',
-      filterAll: '全部记录',
-      filterDeposits: '入金充值',
-      filterWithdrawals: '出金提现',
-      filterYield: '累计收益',
-      filterInvestments: '资本分配',
-      twoFaStatus: '双重身份验证 (2FA)',
-      kycTierLevel: 'KYC 认证级别',
-      accountSecurity: '密码学安全与 API 密钥'
-    },
-    footer: {
-      tagline: '机构级数字资产托管与私人财富账本',
-      regulatoryNotice: 'TradeVerge 依据严格的机构托管标准运营，配备隔离现金储备与多签安全金库。',
-      riskDisclaimer: '数字资产与结构化收益工具涉及市场波动风险。过往业绩不代表未来表现。',
-      copyright: '© 2026 TradeVerge Private Wealth Ltd. 保留所有权利。',
-      quickLinks: '市场与门户',
-      legalLinks: '合规与治理',
-      institutionalServices: '托管与存管服务'
-    }
-  },
-  ja: {
-    auth: {
-      signIn: 'クライアントログイン',
-      clientAccess: 'ポータルアクセス',
-      investorTab: '投資家ポータル',
-      adminTab: 'コンプライアンス管理',
-      investorTitle: 'プライベートウェルスポータル',
-      investorDesc: '分別保管、アクティブ運用益、監査済み台帳勘定にアクセスします。',
-      adminTitle: 'カストディ管理コンソール',
-      adminDesc: '権限を持つコンプライアンスおよび財務担当者専用です。',
-      emailLabel: '登録メールアドレス',
-      passwordLabel: '認証パスワード / 秘密鍵',
-      twoFaBadge: 'ハードウェア 2FA / TOTP 対応',
-      rememberMe: '端末セッションを保持',
-      forgotPassword: 'カストディデスクへ問い合わせ',
-      signInButton: '認証してポータルへ進む',
-      signingIn: '認証中...',
-      demoCredentialsTitle: '役職別ダイレクト認証',
-      demoInvestorBtn: '投資家としてログイン (Arthur Montgomery)',
-      demoAdminBtn: '管理者としてログイン (Marcus Vance - コンプライアンス)',
-      roleDifferentiatedNotice: 'ユーザー権限は認証情報により厳密に区分されます。管理者権限は認証済み担当者アカウントにのみ付与されます。',
-      signOut: 'ログアウト',
-      signOutConfirm: '安全にセッションを終了しますか？',
-      loggedOutSuccess: 'セッションが安全に終了しました。',
-      loggedInSuccess: '認証に成功しました。',
-      invalidCredentials: '認証に失敗しました。認証情報をご確認ください。',
-      adminRequiredMessage: '管理コンソールには管理者権限が必要です。'
-    },
-    adminGuard: {
-      accessDeniedTitle: '管理者権限が必要です',
-      clearanceRequired: 'TradeVerge 管理コンソールへのアクセスは、承認された財務・コンプライアンス責任者のみに制限されています。',
-      securityProtocolNotice: '不正なアクセス試行はすべてタイムスタンプ、暗号学的指紋、IPアドレスとともに不変ログに記録されます。',
-      signInAsAdmin: '管理者認証情報でログイン',
-      returnToInvestorPortal: '投資家ポータルへ戻る'
-    },
-    publicPages: {
-      howItWorksTitle: '機関向けカストディ構造',
-      howItWorksSubtitle: 'TradeVerge が自動台帳照合と監査済み準備金により資産を保護する仕組み。',
-      pricingTitle: '透明性の高い手数料体系',
-      pricingSubtitle: '隠れたスプレッドや不透明な管理費のない機関基準のコスト構造。',
-      securityTitle: 'セキュリティと資産準備金',
-      securitySubtitle: '多層コールドストレージ、分別保管銀行預金、および暗号学的準備金証明。',
-      educationTitle: '機関リサーチ＆分析',
-      educationSubtitle: '専門的な市場分析レポート、マルチアセット戦略、マクロ経済分析。',
-      aboutTitle: 'TradeVerge Private Wealth について',
-      aboutSubtitle: 'ファミリーオフィス、信託、適格投資家のために設計されたプライベートアセットカストディ。',
-      contactTitle: '機関向けお問い合わせ',
-      contactSubtitle: 'チューリッヒおよびニューヨークのプライベートデスクへ直接ご相談いただけます。',
-      legalTitle: '法規制の開示と利用規約',
-      legalSubtitle: '包括的な法的開示文書、コンプライアンスフレームワーク、投資家保護。',
-      tier1Custody: 'ティア1分別保管カストディ',
-      segregatedReserves: '100% 検証可能な資産準備金',
-      auditedLedger: '暗号監査可能な分散台帳',
-      regulatoryCompliance: 'グローバル AML/KYC および FinMA 基準準拠'
-    },
-    investorPages: {
-      transactionsTitle: '監査済み台帳ジャーナル',
-      transactionsSubtitle: '入金、出金、利回り付与のリアルタイムな履歴明細。',
-      documentsTitle: '保管報告書および税務証明書',
-      documentsSubtitle: '公式監査証明書、月次資産報告書、および税務関連書類をダウンロード。',
-      profileTitle: '機関プロファイルとセキュリティ',
-      profileSubtitle: '認証済みID、ハードウェア2FA、ホワイトリスト登録アドレス、セッション管理。',
-      exportCsv: 'ジャーナル CSV エクスポート',
-      filterAll: 'すべての履歴',
-      filterDeposits: '決済済み入金',
-      filterWithdrawals: '出金',
-      filterYield: '発生利益',
-      filterInvestments: '資本配分',
-      twoFaStatus: '2要素認証 (2FA)',
-      kycTierLevel: 'KYC 認証ティア',
-      accountSecurity: '暗号学的セキュリティと API キー'
-    },
-    footer: {
-      tagline: '機関向けデジタルアセットカストディ＆プライベートウェルス台帳',
-      regulatoryNotice: 'TradeVerge は分別保管現金準備金とマルチシグ保管金庫を備え、厳格な機関基準で運営されています。',
-      riskDisclaimer: 'デジタル資産およびストラクチャード商品は市場リスクを伴います。過去の運用実績は将来の成果を保証するものではありません。',
-      copyright: '© 2026 TradeVerge Private Wealth Ltd. All rights reserved.',
-      quickLinks: 'マーケット＆ポータル',
-      legalLinks: 'コンプライアンス＆統治',
-      institutionalServices: 'カストディ保管業務'
-    }
-  },
-  ar: {
-    auth: {
-      signIn: 'تسجيل دخول العملاء',
-      clientAccess: 'دخول البوابة',
-      investorTab: 'بوابة المستثمر',
-      adminTab: 'الامتثال والإدارة',
-      investorTitle: 'بوابة إدارة الثروات الخاصة',
-      investorDesc: 'الوصول إلى الحفظ المفصول والعوائد النشطة وسجلات الحسابات المدققة.',
-      adminTitle: 'لوحة التحكم الإدارية للحفظ',
-      adminDesc: 'مخصصة لمسؤولي الامتثال والخزينة والمقاصة المصرح لهم فقط.',
-      emailLabel: 'البريد الإلكتروني المعتمد',
-      passwordLabel: 'بيانات الاعتماد / كلمة المرور',
-      twoFaBadge: 'محمي بواسطة 2FA / TOTP الأمني',
-      rememberMe: 'تذكر جلسة هذه المحطة',
-      forgotPassword: 'إعادة التعيين عبر مكتب الحفظ',
-      signInButton: 'المصادقة والدخول إلى البوابة',
-      signingIn: 'جاري التحقق من بيانات الاعتماد...',
-      demoCredentialsTitle: 'المصادقة المباشرة حسب الدور',
-      demoInvestorBtn: 'دخول كمستثمر (Sir Arthur Montgomery)',
-      demoAdminBtn: 'دخول كمسؤول إدارة (Marcus Vance - رئيس الامتثال)',
-      roleDifferentiatedNotice: 'يتم التمييز بين أدوار المستخدمين بدقة عبر بيانات الاعتماد. تمنح الامتيازات الإدارية حصرياً لحسابات المسؤولين المعتمدة.',
-      signOut: 'تسجيل الخروج',
-      signOutConfirm: 'هل ترغب في إنهاء الجلسة الآمنة؟',
-      loggedOutSuccess: 'تم إنهاء الجلسة بأمان.',
-      loggedInSuccess: 'تم تسجيل الدخول بنجاح.',
-      invalidCredentials: 'فشلت المصادقة. يرجى التحقق من بيانات الاعتماد الخاصة بك.',
-      adminRequiredMessage: 'مطلوب صلاحية إدارية للوصول إلى هذه اللوحة.'
-    },
-    adminGuard: {
-      accessDeniedTitle: 'تصريح إداري مطلوب',
-      clearanceRequired: 'الوصول إلى لوحة إدارة TradeVerge مقتصر حصرياً على مسؤولي الخزينة والامتثال المعتمدين.',
-      securityProtocolNotice: 'يتم تسجيل جميع محاولات الدخول غير المصرح بها مع الطابع الزمني والبصمة الرقمية وعنوان IP.',
-      signInAsAdmin: 'تسجيل الدخول ببيانات المسؤول',
-      returnToInvestorPortal: 'العودة إلى بوابة المستثمر'
-    },
-    publicPages: {
-      howItWorksTitle: 'بنية الحفظ المؤسسي',
-      howItWorksSubtitle: 'كيف تحمي TradeVerge رؤوس الأموال عبر التسوية الآلية والاحتياطيات المدققة.',
-      pricingTitle: 'جدول رسوم شفاف',
-      pricingSubtitle: 'هيكل تكلفة مؤسسي بدون فروق أسعار مخفية أو رسوم إدارة إضافية.',
-      securityTitle: 'الأمان والاحتياطيات الإيداعية',
-      securitySubtitle: 'خزائن حفظ باردة متعددة الطبقات وإيداعات مصرفية مفصولة وإثبات تشفيري للاحتياطيات.',
-      educationTitle: 'الأبحاث والتحليلات المؤسسية',
-      educationSubtitle: 'تقارير سوقية متقدمة واستراتيجيات تخصيص الأصول وتحليلات اقتصادية شاملة.',
-      aboutTitle: 'عن TradeVerge Private Wealth',
-      aboutSubtitle: 'مؤسسة حفظ أصول خاصة صممت خصيصاً للمكاتب العائلية وصناديق الائتمان والمستثمرين المؤهلين.',
-      contactTitle: 'الاستفسارات المؤسسية المباشرة',
-      contactSubtitle: 'تواصل مع مكاتبنا في زيورخ ونيويورك للحصول على خدمة مخصصة.',
-      legalTitle: 'الإفصاحات التنظيمية والشروط',
-      legalSubtitle: 'التوثيق القانوني الشامل وأطر الامتثال وحماية المستثمر.',
-      tier1Custody: 'حفظ إيداعي من الدرجة الأولى',
-      segregatedReserves: 'احتياطيات أصول قابلة للتحقق بنسبة 100%',
-      auditedLedger: 'دفتر أستاذ مشفر قابل للتدقيق',
-      regulatoryCompliance: 'معايير الامتثال ومكافحة غسل الأموال العالمية'
-    },
-    investorPages: {
-      transactionsTitle: 'دفتر يومية الحسابات المدقق',
-      transactionsSubtitle: 'سجل زمني لحظي لجميع الإيداعات والسحوبات والعوائد المستحقة.',
-      documentsTitle: 'كشوفات الحفظ والتقارير الضريبية',
-      documentsSubtitle: 'تحميل شهادات التدقيق الرسمية والبيانات الشهرية والشهادات الضريبية.',
-      profileTitle: 'الملف الشخصي والأمان المؤسسي',
-      profileSubtitle: 'إدارة الهوية المعتمدة، مفاتيح 2FA، والعناوين المعتمدة في القائمة البيضاء.',
-      exportCsv: 'تصدير السجل CSV',
-      filterAll: 'كافة المعاملات',
-      filterDeposits: 'الإيداعات المعتمدة',
-      filterWithdrawals: 'السحوبات',
-      filterYield: 'العوائد المستحقة',
-      filterInvestments: 'تخصيصات رأس المال',
-      twoFaStatus: 'المصادقة الثنائية (2FA)',
-      kycTierLevel: 'مستوى التحقق من الهوية KYC',
-      accountSecurity: 'الأمان التشفيري ومفاتيح API'
-    },
-    footer: {
-      tagline: 'حفظ الأصول الرقمية المؤسسية ودفتر أستاذ الثروات الخاصة',
-      regulatoryNotice: 'تعمل TradeVerge وفق بروتوكولات حفظ مؤسسية صارمة مع احتياطيات نقدية مفصولة وخزائن متعددة التوقيع.',
-      riskDisclaimer: 'تنطوي الأصول الرقمية على مخاطر تقلبات الأسواق المالية. الأداء السابق لا يضمن النتائج المستقبلية.',
-      copyright: '© 2026 TradeVerge Private Wealth Ltd. جميع الحقوق محفوظة.',
-      quickLinks: 'الأسواق والبوابات',
-      legalLinks: 'الامتثال والحوكمة',
-      institutionalServices: 'خدمات الحفظ الأمين'
-    }
-  },
-  pt: {
-    auth: {
-      signIn: 'Acesso do Cliente',
-      clientAccess: 'Entrar no Portal',
-      investorTab: 'Portal do Investidor',
-      adminTab: 'Conformidade & Admin',
-      investorTitle: 'Portal de Gestão de Fortuna',
-      investorDesc: 'Acesse custódia segregada, rendimentos ativos e contas de livro-razão auditadas.',
-      adminTitle: 'Console de Administração Depositária',
-      adminDesc: 'Restrito a oficiais autorizados de conformidade, tesouraria e compensação.',
-      emailLabel: 'E-mail Autorizado',
-      passwordLabel: 'Credencial Criptográfica / Senha',
-      twoFaBadge: 'Protegido com 2FA de Hardware / TOTP',
-      rememberMe: 'Lembrar sessão deste terminal',
-      forgotPassword: 'Redefinir via mesa de custódia',
-      signInButton: 'Autenticar e Entrar no Portal',
-      signingIn: 'Verificando Credenciais...',
-      demoCredentialsTitle: 'Autenticação Direta por Função',
-      demoInvestorBtn: 'Entrar como Investidor (Sir Arthur Montgomery)',
-      demoAdminBtn: 'Entrar como Admin (Marcus Vance - Líder de Conformidade)',
-      roleDifferentiatedNotice: 'As funções de usuário são estritamente diferenciadas pelas credenciais. Os privilégios de administração são concedidos exclusivamente a contas de oficiais verificados.',
-      signOut: 'Sair da Conta',
-      signOutConfirm: 'Deseja encerrar a sessão autenticada?',
-      loggedOutSuccess: 'Sessão encerrada com segurança.',
-      loggedInSuccess: 'Autenticado com sucesso.',
-      invalidCredentials: 'Falha na autenticação. Verifique suas credenciais institucionais.',
-      adminRequiredMessage: 'Função de administrador necessária para acessar este console.'
-    },
-    adminGuard: {
-      accessDeniedTitle: 'Autorização Administrativa Necessária',
-      clearanceRequired: 'O acesso ao console de administração da TradeVerge é restrito exclusivamente a oficiais de tesouraria e conformidade.',
-      securityProtocolNotice: 'Todas as tentativas de acesso não autorizado são registradas com carimbo de data/hora, impressão criptográfica e IP em registros imutáveis.',
-      signInAsAdmin: 'Entrar com Credenciais de Administrador',
-      returnToInvestorPortal: 'Voltar ao Portal do Investidor'
-    },
-    publicPages: {
-      howItWorksTitle: 'Arquitetura de Custódia Institucional',
-      howItWorksSubtitle: 'Como a TradeVerge protege o patrimônio com conciliação contábil automatizada e reservas auditadas.',
-      pricingTitle: 'Tabela de Tarifas Transparente',
-      pricingSubtitle: 'Estrutura de custos institucional sem taxas ocultas ou spreads de gestão adicionais.',
-      securityTitle: 'Segurança e Reservas Depositárias',
-      securitySubtitle: 'Armazenamento a frio multicamadas, contas bancárias segregadas e prova criptográfica de reservas.',
-      educationTitle: 'Pesquisa e Inteligência Institucional',
-      educationSubtitle: 'Relatórios de mercado, estratégias multiativos e análises macroeconômicas aprofundadas.',
-      aboutTitle: 'Sobre a TradeVerge Private Wealth',
-      aboutSubtitle: 'Depositária privada de ativos digitais para family offices, fundos e investidores qualificados.',
-      contactTitle: 'Atendimento Institucional Direto',
-      contactSubtitle: 'Conecte-se com nossas mesas de Zurique e Nova York para integração personalizada.',
-      legalTitle: 'Divulgações Regulatórias e Termos',
-      legalSubtitle: 'Documentação jurídica integral, normas de conformidade e garantias ao investidor.',
-      tier1Custody: 'Custódia Depositária de Nível 1',
-      segregatedReserves: '100% de Reservas de Ativos Verificáveis',
-      auditedLedger: 'Livro-Razão Criptograficamente Auditável',
-      regulatoryCompliance: 'Normas Globais de AML/KYC e FinMA'
-    },
-    investorPages: {
-      transactionsTitle: 'Livro Diário Auditado',
-      transactionsSubtitle: 'Registro cronológico em tempo real de depósitos liquidados, desembolsos e rendimentos.',
-      documentsTitle: 'Extratos de Custódia e Informes Fiscais',
-      documentsSubtitle: 'Baixe certificados de auditoria oficiais, extratos mensais e comprovantes fiscais.',
-      profileTitle: 'Perfil Institucional e Segurança',
-      profileSubtitle: 'Gerencie identidade verificada, chaves 2FA, endereços permitidos e registros de auditoria.',
-      exportCsv: 'Exportar Diário em CSV',
-      filterAll: 'Todos os Registros',
-      filterDeposits: 'Depósitos Compensados',
-      filterWithdrawals: 'Desembolsos',
-      filterYield: 'Rendimentos Acumulados',
-      filterInvestments: 'Alocações de Capital',
-      twoFaStatus: 'Autenticação de Dois Fatores (2FA)',
-      kycTierLevel: 'Nível de Verificação KYC',
-      accountSecurity: 'Segurança Criptográfica e Chaves de API'
-    },
-    footer: {
-      tagline: 'Custódia de Ativos Digitais Institucionais e Livro-Razão de Wealth Management',
-      regulatoryNotice: 'A TradeVerge opera sob rígidos protocolos de custódia institucional com reservas segregadas e cofres multifirma.',
-      riskDisclaimer: 'Ativos digitais e veículos estruturados envolvem riscos de mercado. O desempenho passado não garante resultados futuros.',
-      copyright: '© 2026 TradeVerge Private Wealth Ltd. Todos os direitos reservados.',
-      quickLinks: 'Mercado e Portais',
-      legalLinks: 'Conformidade e Governança',
-      institutionalServices: 'Serviços de Custódia'
-    }
-  },
-  ru: {
-    auth: {
-      signIn: 'Вход для клиентов',
-      clientAccess: 'Вход в портал',
-      investorTab: 'Портал инвестора',
-      adminTab: 'Комплаенс и админ',
-      investorTitle: 'Портал управления капиталом',
-      investorDesc: 'Доступ к сегрегированному хранению, активным доходным стратегиям и аудируемым реестрам.',
-      adminTitle: 'Консоль администратора депозитария',
-      adminDesc: 'Доступ разрешен исключительно уполномоченным офицерам комплаенса и казначейства.',
-      emailLabel: 'Авторизованный Email',
-      passwordLabel: 'Криптографический пароль / Ключ',
-      twoFaBadge: 'Защита аппаратным 2FA / TOTP',
-      rememberMe: 'Запомнить сессию терминала',
-      forgotPassword: 'Сброс через отдел кастоди',
-      signInButton: 'Аутентифицироваться и войти',
-      signingIn: 'Проверка учетных данных...',
-      demoCredentialsTitle: 'Прямая аутентификация по роли',
-      demoInvestorBtn: 'Войти как инвестор (Sir Arthur Montgomery)',
-      demoAdminBtn: 'Войти как админ (Marcus Vance - Комплаенс)',
-      roleDifferentiatedNotice: 'Роли пользователей строго разделены по учетным записям. Права администратора предоставляются только проверенным офицерам.',
-      signOut: 'Выйти из системы',
-      signOutConfirm: 'Завершить защищенную сессию?',
-      loggedOutSuccess: 'Сессия успешно завершена.',
-      loggedInSuccess: 'Успешная аутентификация.',
-      invalidCredentials: 'Неверные учетные данные. Пожалуйста, проверьте логин и пароль.',
-      adminRequiredMessage: 'Для доступа к этой консоли требуются права администратора.'
-    },
-    adminGuard: {
-      accessDeniedTitle: 'Требуется административный допуск',
-      clearanceRequired: 'Доступ к консоли администрирования TradeVerge разрешен только авторизованным офицерам казначейства и комплаенса.',
-      securityProtocolNotice: 'Все попытки несанкционированного доступа фиксируются в неизменяемом журнале с временной меткой, хэшем и IP-адресом.',
-      signInAsAdmin: 'Войти с учетными данными администратора',
-      returnToInvestorPortal: 'Вернуться в портал инвестора'
-    },
-    publicPages: {
-      howItWorksTitle: 'Архитектура институционального кастоди',
-      howItWorksSubtitle: 'Как TradeVerge защищает крупный частный капитал с помощью автоматической сверки и аудируемых резервов.',
-      pricingTitle: 'Прозрачная структура комиссий',
-      pricingSubtitle: 'Институциональные тарифы без скрытых надбавок к спредам и дополнительных комиссий.',
-      securityTitle: 'Безопасность и депозитарные резервы',
-      securitySubtitle: 'Многоуровневые холодные хранилища, сегрегированные банковские счета и криптографическое доказательство резервов.',
-      educationTitle: 'Аналитика и исследования',
-      educationSubtitle: 'Профессиональные обзоры рынков, стратегии мультиактивного распределения и макроэкономический анализ.',
-      aboutTitle: 'О компании TradeVerge Private Wealth',
-      aboutSubtitle: 'Специализированный депозитарий частных активов для семейных офисов, трастов и квалифицированных инвесторов.',
-      contactTitle: 'Прямые институциональные запросы',
-      contactSubtitle: 'Свяжитесь с нашими офисами в Цюрихе и Нью-Йорке для индивидуального подключения.',
-      legalTitle: 'Нормативные раскрытия и условия',
-      legalSubtitle: 'Полная юридическая документация, регламенты комплаенса и стандарты защиты инвесторов.',
-      tier1Custody: 'Депозитарное хранение высшего уровня (Tier 1)',
-      segregatedReserves: '100% верифицируемые резервы активов',
-      auditedLedger: 'Криптографически верифицируемый реестр',
-      regulatoryCompliance: 'Стандарты FinMA и глобальные нормы AML/KYC'
-    },
-    investorPages: {
-      transactionsTitle: 'Журнал аудируемого реестра',
-      transactionsSubtitle: 'Хронологический учет всех подтвержденных депозитов, выплат и начисленного дохода в реальном времени.',
-      documentsTitle: 'Депозитарные выписки и налоговые отчеты',
-      documentsSubtitle: 'Скачивайте официальные подтверждения аудиторов, ежемесячные отчеты и налоговые сертификаты.',
-      profileTitle: 'Профиль институционала и безопасность',
-      profileSubtitle: 'Управление верификацией, аппаратными 2FA ключами, белыми списками адресов и сессиями аудита.',
-      exportCsv: 'Экспорт журнала в CSV',
-      filterAll: 'Все операции',
-      filterDeposits: 'Подтвержденные депозиты',
-      filterWithdrawals: 'Выплаты',
-      filterYield: 'Начисленный доход',
-      filterInvestments: 'Аллокация капитала',
-      twoFaStatus: 'Двухфакторная аутентификация (2FA)',
-      kycTierLevel: 'Уровень проверки KYC',
-      accountSecurity: 'Криптографическая безопасность и API ключи'
-    },
-    footer: {
-      tagline: 'Институциональный кастоди цифровых активов и реестр частного капитала',
-      regulatoryNotice: 'TradeVerge работает по строгим протоколам институционального хранения с сегрегированными резервами и мультиподписными сейфами.',
-      riskDisclaimer: 'Цифровые активы и структурированные инструменты сопряжены с финансовыми рисками. Прошлые результаты не гарантируют доходность в будущем.',
-      copyright: '© 2026 TradeVerge Private Wealth Ltd. Все права защищены.',
-      quickLinks: 'Маркетплейс и порталы',
-      legalLinks: 'Комплаенс и регулирование',
-      institutionalServices: 'Депозитарные услуги'
-    }
-  },
-  it: {
-    auth: {
-      signIn: 'Accesso Clienti',
-      clientAccess: 'Accedi al Portale',
-      investorTab: 'Portale Investitore',
-      adminTab: 'Conformità & Admin',
-      investorTitle: 'Portale Private Wealth',
-      investorDesc: 'Accedi a custodia segregata, allocazioni a rendimento attivo e registri contabili certificati.',
-      adminTitle: 'Console Amministrativa Depositaria',
-      adminDesc: 'Accesso riservato agli ufficiali autorizzati di conformità, tesoreria e compensazione.',
-      emailLabel: 'Email Autorizzata',
-      passwordLabel: 'Credenziale Crittografica / Password',
-      twoFaBadge: 'Protetto da Hardware 2FA / TOTP',
-      rememberMe: 'Memorizza sessione del terminale',
-      forgotPassword: 'Reimposta tramite desk di custodia',
-      signInButton: 'Autenticati ed Entra nel Portale',
-      signingIn: 'Verifica Credenziali...',
-      demoCredentialsTitle: 'Autenticazione Diretta per Ruolo',
-      demoInvestorBtn: 'Accedi come Investitore (Sir Arthur Montgomery)',
-      demoAdminBtn: 'Accedi come Admin (Marcus Vance - Responsabile Conformità)',
-      roleDifferentiatedNotice: 'I ruoli utente sono rigorosamente differenziati dalle credenziali di accesso. I privilegi amministrativi sono concessi solo ad account ufficiali verificati.',
-      signOut: 'Disconnetti',
-      signOutConfirm: 'Terminare la sessione autenticata?',
-      loggedOutSuccess: 'Sessione terminata in sicurezza.',
-      loggedInSuccess: 'Autenticato con successo.',
-      invalidCredentials: 'Autenticazione non riuscita. Verificare le credenziali istituzionali.',
-      adminRequiredMessage: 'Ruolo di amministratore richiesto per questa console.'
-    },
-    adminGuard: {
-      accessDeniedTitle: 'Autorizzazione Amministrativa Richiesta',
-      clearanceRequired: 'L’accesso alla console di amministrazione TradeVerge è riservato esclusivamente ai responsabili di tesoreria e conformità.',
-      securityProtocolNotice: 'Ogni tentativo di accesso non autorizzato viene registrato con data, ora, impronta crittografica e IP in registri immutabili.',
-      signInAsAdmin: 'Accedi con Credenziali di Amministratore',
-      returnToInvestorPortal: 'Ritorna al Portale Investitore'
-    },
-    publicPages: {
-      howItWorksTitle: 'Architettura di Custodia Istituzionale',
-      howItWorksSubtitle: 'Come TradeVerge protegge i grandi patrimoni con riconciliazione contabile automatizzata e riserve certificate.',
-      pricingTitle: 'Piano Commissionale Trasparente',
-      pricingSubtitle: 'Struttura costi istituzionale senza spread nascosti o commissioni di gestione aggiuntive.',
-      securityTitle: 'Sicurezza e Riserve Depositarie',
-      securitySubtitle: 'Caveau cold storage multilivello, depositi bancari segregati e prova crittografica delle riserve.',
-      educationTitle: 'Ricerca e Analisi Istituzionale',
-      educationSubtitle: 'Report di mercato, strategie multi-asset e analisi macroeconomica approfondita.',
-      aboutTitle: 'Chi è TradeVerge Private Wealth',
-      aboutSubtitle: 'Depositario privato di asset per family office, trust e investitori qualificati.',
-      contactTitle: 'Assistenza Istituzionale Diretta',
-      contactSubtitle: 'Contatta i nostri desk di Zurigo e New York per un servizio di custodia personalizzato.',
-      legalTitle: 'Informativa Normativa e Termini',
-      legalSubtitle: 'Documentazione legale esaustiva, quadri di conformità e tutele per gli investitori.',
-      tier1Custody: 'Custodia Depositaria di Livello 1',
-      segregatedReserves: '100% di Riserve di Asset Verificabili',
-      auditedLedger: 'Mastro Contabile Crittograficamente Verificabile',
-      regulatoryCompliance: 'Standard Internazionali AML/KYC e FinMA'
-    },
-    investorPages: {
-      transactionsTitle: 'Giornale Contabile Verificato',
-      transactionsSubtitle: 'Cronologia in tempo reale di depositi contabilizzati, prelievi e accrediti di rendimento.',
-      documentsTitle: 'Estratti Conto e Certificazioni Fiscali',
-      documentsSubtitle: 'Scarica le conferme ufficiali dei revisori, gli estratti conto mensili e le certificazioni fiscali.',
-      profileTitle: 'Profilo Istituzionale e Sicurezza',
-      profileSubtitle: 'Gestisci identità verificata, chiavi 2FA hardware, indirizzi whitelist e sessioni di audit.',
-      exportCsv: 'Esporta Giornale in CSV',
-      filterAll: 'Tutti i Movimenti',
-      filterDeposits: 'Depositi Contabilizzati',
-      filterWithdrawals: 'Prelievi',
-      filterYield: 'Rendimenti Maturati',
-      filterInvestments: 'Allocazioni di Capitale',
-      twoFaStatus: 'Autenticazione a Due Fattori (2FA)',
-      kycTierLevel: 'Livello di Verifica KYC',
-      accountSecurity: 'Sicurezza Crittografica e Chiavi API'
-    },
-    footer: {
-      tagline: 'Custodia di Asset Digitali Istituzionali e Registro Private Wealth',
-      regulatoryNotice: 'TradeVerge opera secondo rigidi protocolli di custodia con riserve di liquidità segregate e caveau multifirma.',
-      riskDisclaimer: 'Gli asset digitali e i prodotti strutturati comportano rischi di mercato. I rendimenti passati non garantiscono risultati futuri.',
-      copyright: '© 2026 TradeVerge Private Wealth Ltd. Tutti i diritti riservati.',
-      quickLinks: 'Mercato e Portali',
-      legalLinks: 'Conformità e Governance',
-      institutionalServices: 'Servizi di Custodia Depositaria'
+    kyc: {
+      badge: 'Regulatorische Identität & Compliance',
+      title: 'Stufe-2 KYC-Verifizierung',
+      submitButton: 'Verifizierungsakte an Compliance Übermitteln'
     }
   }
+};
+
+const zhOverrides: Partial<PageTranslations> = {
+  publicPages: {
+    ...defaultEnPageTranslations.publicPages,
+    marketplace: {
+      badge: '机构资本市场',
+      title: '投资工具与量化策略',
+      subtitle: '经过投资委员会严格审查的确定性结构化收益机会，资金完全独立隔离。',
+      searchPlaceholder: '搜索策略名称、代号或资产类别...',
+      allocateButton: '配置资产'
+    },
+    howItWorks: {
+      ...defaultEnPageTranslations.publicPages.howItWorks,
+      badge: '业务全景',
+      title: '端到端托管与收益机制',
+      subtitle: '从清算注资到确定性复利计息：经全面审计的11步受托流程。',
+      ctaTitle: '准备配置机构级资本？',
+      ctaDesc: '即刻完成合规账户开立，尊享顶级收益方案。',
+      ctaButton: '开设私人财富账户',
+      explorePlansButton: '浏览全部策略'
+    }
+  },
+  investorPages: {
+    ...defaultEnPageTranslations.investorPages,
+    transactions: {
+      badge: '不可篡改会计账本',
+      title: '交易流水账',
+      subtitle: '资金托管、投资划转和收益分配的权威复式记账明细。',
+      exportCsv: '导出交易流水 CSV',
+      searchPlaceholder: '搜索账目流水号、参考号或描述...',
+      colEntry: '会计分录',
+      colType: '类型',
+      colDescription: '描述',
+      colAmount: '金额',
+      colTimestamp: '时间戳',
+      colStatus: '状态',
+      colAction: '凭证证书'
+    },
+    documents: {
+      badge: '合规与税务保险库',
+      title: '机构文件与认证证书',
+      subtitle: '密码学签名对账单、托管隔离凭证及年度税务核数报告。',
+      downloadButton: '下载加密 PDF'
+    },
+    profile: {
+      badge: '机构身份与安全控制',
+      title: '账户安全与访问管理',
+      subtitle: '管理硬件双因子认证 (2FA)、合规等级凭据与当前终端会话。',
+      cardProfile: '机构实体档案',
+      card2Fa: '硬件双因子身份验证',
+      enable2Fa: '启用身份验证器 2FA',
+      activeSessions: '活跃终端会话'
+    },
+    kyc: {
+      badge: '合规与监管身份识别',
+      title: '第二级别 (Tier 2) KYC 身份核验',
+      submitButton: '提交核验材料至风控合规部'
+    }
+  }
+};
+
+const jaOverrides: Partial<PageTranslations> = {
+  publicPages: {
+    ...defaultEnPageTranslations.publicPages,
+    marketplace: {
+      badge: '機関投資家向け資本市場',
+      title: '投資ビークルおよび運用戦略',
+      subtitle: '投資委員会により厳格に審査された確定型構造化利回り戦略。',
+      searchPlaceholder: '戦略名、コード、資産クラスを検索...',
+      allocateButton: '資金を配分'
+    },
+    howItWorks: {
+      ...defaultEnPageTranslations.publicPages.howItWorks,
+      badge: 'ライフサイクル概要',
+      title: 'エンドツーエンドのカストディおよび利回り構造',
+      subtitle: '電信送金の清算から確定利回りの複利計算まで：11ステップの監査済み受託プロセス。',
+      ctaTitle: '機関資本の運用を開始しますか？',
+      ctaDesc: '検証済みのカストディオンボーディングを完了し、高水準の利回りへアクセス。',
+      ctaButton: 'プライベート口座を開設',
+      explorePlansButton: '全戦略を閲覧'
+    }
+  },
+  investorPages: {
+    ...defaultEnPageTranslations.investorPages,
+    transactions: {
+      badge: '不変の複式会計台帳',
+      title: '取引仕訳帳',
+      subtitle: '受託預入、配分、および利回り分配の権威ある複式簿記記録。',
+      exportCsv: '仕訳帳 CSV をエクスポート',
+      searchPlaceholder: '仕訳番号、参照番号、摘要を検索...',
+      colEntry: '仕訳番号',
+      colType: '種類',
+      colDescription: '摘要',
+      colAmount: '金額',
+      colTimestamp: 'タイムスタンプ',
+      colStatus: '状態',
+      colAction: '証明書'
+    },
+    documents: {
+      badge: 'コンプライアンス＆税務保管庫',
+      title: '機関文書および認定証明書',
+      subtitle: '暗号署名付き残高証明書、カストディ証明書、年次監査税務明細。',
+      downloadButton: 'PDF をダウンロード'
+    },
+    profile: {
+      badge: '機関識別情報とセキュリティ',
+      title: '口座セキュリティおよびアクセス制御',
+      subtitle: 'ハードウェア2段階認証、適格投資家資格、アクティブセッションを管理。',
+      cardProfile: '機関法人プロフィール',
+      card2Fa: 'ハードウェア2段階認証 (2FA)',
+      enable2Fa: '2段階認証を有効化',
+      activeSessions: 'アクティブな端末セッション'
+    },
+    kyc: {
+      badge: '法規制コンプライアンス本人確認',
+      title: 'Tier 2 KYC 認証手続き',
+      submitButton: '検証書類をコンプライアンス部門へ提出'
+    }
+  }
+};
+
+const arOverrides: Partial<PageTranslations> = {
+  publicPages: {
+    ...defaultEnPageTranslations.publicPages,
+    marketplace: {
+      badge: 'سوق رأس المال المؤسسي',
+      title: 'أوعية واستراتيجيات الاستثمار',
+      subtitle: 'فرص عوائد مهيكلة محددة معتمدة من لجنة الاستثمار مع عزل تام للأصول.',
+      searchPlaceholder: 'ابحث عن اسم الاستراتيجية أو فئة الأصول...',
+      allocateButton: 'تخصيص رأس المال'
+    }
+  },
+  investorPages: {
+    ...defaultEnPageTranslations.investorPages,
+    transactions: {
+      badge: 'دفتر الأستاذ المحاسبي الثابت',
+      title: 'سجل المعاملات',
+      subtitle: 'سجل القيد المزدوج المعتمد لإيداعات الحفظ وتوزيعات العوائد.',
+      exportCsv: 'تصدير السجل بتنسيق CSV',
+      searchPlaceholder: 'البحث عن معرّف المعاملة أو المرجع...',
+      colEntry: 'القيد المحاسبي',
+      colType: 'النوع',
+      colDescription: 'الوصف',
+      colAmount: 'المبلغ',
+      colTimestamp: 'التاريخ والوقت',
+      colStatus: 'الحالة',
+      colAction: 'الشهادة'
+    },
+    documents: {
+      badge: 'خزينة الامتثال والضرائب',
+      title: 'المستندات المؤسسية والشهادات',
+      subtitle: 'بيانات موقعة مشفرة وشهادات حفظ وتقارير تدقيق ضريبية سنوية.',
+      downloadButton: 'تحميل كملف PDF'
+    },
+    profile: {
+      badge: 'الهوية المؤسسية والأمان',
+      title: 'أمان الحساب وضوابط الوصول',
+      subtitle: 'إدارة المصادقة الثنائية وجلسات المحطة الطرفية النشطة.',
+      cardProfile: 'ملف الكيان المؤسسي',
+      card2Fa: 'المصادقة الثنائية (2FA)',
+      enable2Fa: 'تفعيل المصادقة الثنائية',
+      activeSessions: 'جلسات الأجهزة النشطة'
+    },
+    kyc: {
+      badge: 'الامتثال والهوية التنظيمية',
+      title: 'التحقق من الهوية (KYC) المستوى الثاني',
+      submitButton: 'إرسال ملف التحقق إلى قسم الامتثال'
+    }
+  }
+};
+
+const ptOverrides: Partial<PageTranslations> = {
+  publicPages: {
+    ...defaultEnPageTranslations.publicPages,
+    marketplace: {
+      badge: 'Mercado Institucional de Capitais',
+      title: 'Veículos e Estratégias de Investimento',
+      subtitle: 'Oportunidades determinísticas de rendimento com isolamento patrimonial.',
+      searchPlaceholder: 'Buscar estratégia, código ou classe de ativos...',
+      allocateButton: 'Alocar Capital'
+    }
+  },
+  investorPages: {
+    ...defaultEnPageTranslations.investorPages,
+    transactions: {
+      badge: 'Livro Razão Contábil Imutável',
+      title: 'Diário de Transações',
+      subtitle: 'Registro de partidas dobradas para depósitos, alocações e rendimentos.',
+      exportCsv: 'Exportar Razão em CSV',
+      searchPlaceholder: 'Pesquisar ID do Diário, Ref ou Descrição...',
+      colEntry: 'Lançamento',
+      colType: 'Tipo',
+      colDescription: 'Descrição',
+      colAmount: 'Valor',
+      colTimestamp: 'Data e Hora',
+      colStatus: 'Status',
+      colAction: 'Certificado'
+    },
+    documents: {
+      badge: 'Cofre de Compliance e Tributário',
+      title: 'Documentos Institucionais e Certificados',
+      subtitle: 'Extratos assinados criptograficamente, certificados de custódia e relatórios fiscais anuais.',
+      downloadButton: 'Baixar PDF'
+    },
+    profile: {
+      badge: 'Identidade Institucional e Segurança',
+      title: 'Segurança da Conta e Controle de Acesso',
+      subtitle: 'Gerencie autenticadores de hardware, credenciais de compliance e sessões ativas.',
+      cardProfile: 'Perfil da Entidade Institucional',
+      card2Fa: 'Autenticação 2FA de Hardware',
+      enable2Fa: 'Habilitar Autenticador 2FA',
+      activeSessions: 'Sessões Ativas no Terminal'
+    },
+    kyc: {
+      badge: 'Identidade Regulatória e Compliance',
+      title: 'Verificação KYC Nível 2',
+      submitButton: 'Enviar Arquivo de Verificação para Compliance'
+    }
+  }
+};
+
+const itOverrides: Partial<PageTranslations> = {
+  publicPages: {
+    ...defaultEnPageTranslations.publicPages,
+    marketplace: {
+      badge: 'Mercato dei Capitali Istituzionali',
+      title: 'Veicoli e Strategie di Investimento',
+      subtitle: 'Opportunità di rendimento deterministico con segregazione patrimoniale.',
+      searchPlaceholder: 'Cerca strategia, codice o classe di attivi...',
+      allocateButton: 'Alloca Capitale'
+    }
+  },
+  investorPages: {
+    ...defaultEnPageTranslations.investorPages,
+    transactions: {
+      badge: 'Mastro Contabile Immutabile',
+      title: 'Giornale delle Transazioni',
+      subtitle: 'Registro ufficiale in partita doppia per depositi, allocazioni e rendimenti.',
+      exportCsv: 'Esporta Giornale CSV',
+      searchPlaceholder: 'Cerca ID Giornale, Riferimento o Descrizione...',
+      colEntry: 'Registrazione',
+      colType: 'Tipo',
+      colDescription: 'Descrizione',
+      colAmount: 'Importo',
+      colTimestamp: 'Data e Ora',
+      colStatus: 'Stato',
+      colAction: 'Certificato'
+    },
+    documents: {
+      badge: 'Cassaforte Fiscale e di Conformità',
+      title: 'Documenti Istituzionali e Certificati',
+      subtitle: 'Estratti conto firmati crittograficamente, certificati di custodia e attestazioni fiscali.',
+      downloadButton: 'Scarica PDF'
+    },
+    profile: {
+      badge: 'Identità Istituzionale e Sicurezza',
+      title: 'Sicurezza del Conto e Controlli di Accesso',
+      subtitle: 'Gestisci autenticatori hardware, credenziali di conformità e sessioni attive.',
+      cardProfile: 'Profilo dell’Entità Istituzionale',
+      card2Fa: 'Autenticazione Hardware a Due Fattori',
+      enable2Fa: 'Attiva Autenticatore 2FA',
+      activeSessions: 'Sessioni Terminale Attive'
+    },
+    kyc: {
+      badge: 'Identità Regolamentare e Conformità',
+      title: 'Verifica KYC Livello 2',
+      submitButton: 'Invia Dossier all’Ufficio Conformità'
+    }
+  }
+};
+
+const ruOverrides: Partial<PageTranslations> = {
+  publicPages: {
+    ...defaultEnPageTranslations.publicPages,
+    marketplace: {
+      badge: 'Институциональный рынок капитала',
+      title: 'Инвестиционные механизмы и стратегии',
+      subtitle: 'Детерминированная доходность, одобренная Инвестиционным комитетом, с сегрегацией активов.',
+      searchPlaceholder: 'Поиск по названию, коду или классу активов...',
+      allocateButton: 'Аллоцировать капитал'
+    }
+  },
+  investorPages: {
+    ...defaultEnPageTranslations.investorPages,
+    transactions: {
+      badge: 'Неизменяемый бухгалтерский реестр',
+      title: 'Журнал транзакций',
+      subtitle: 'Авторитетная двойная запись депозитарных поступлений, аллокаций и начислений доходности.',
+      exportCsv: 'Экспорт журнала в CSV',
+      searchPlaceholder: 'Поиск по ID, референсу или описанию...',
+      colEntry: 'Запись журнала',
+      colType: 'Тип',
+      colDescription: 'Описание',
+      colAmount: 'Сумма',
+      colTimestamp: 'Время и дата',
+      colStatus: 'Статус',
+      colAction: 'Сертификат'
+    },
+    documents: {
+      badge: 'Комплаенс и налоговый сейф',
+      title: 'Институциональные документы и сертификаты',
+      subtitle: 'Криптографически подписанные выписки, сертификаты хранения и годовая налоговая отчетность.',
+      downloadButton: 'Скачать PDF'
+    },
+    profile: {
+      badge: 'Институциональная идентификация и безопасность',
+      title: 'Безопасность аккаунта и управление доступом',
+      subtitle: 'Управление аппаратными 2FA-ключами, комплаенс-статусом и активными сессиями.',
+      cardProfile: 'Профиль институционального субъекта',
+      card2Fa: 'Аппаратная двухфакторная аутентификация',
+      enable2Fa: 'Включить Authenticator 2FA',
+      activeSessions: 'Активные терминальные сессии'
+    },
+    kyc: {
+      badge: 'Регуляторная идентификация и комплаенс',
+      title: 'Верификация KYC 2-го уровня',
+      submitButton: 'Отправить досье в службу комплаенс'
+    }
+  }
+};
+
+// Assembled record with deep merging so NO property can EVER be undefined!
+export const pageTranslations: Record<LanguageCode, PageTranslations> = {
+  en: defaultEnPageTranslations,
+  es: deepMerge<PageTranslations>(defaultEnPageTranslations, esOverrides),
+  fr: deepMerge<PageTranslations>(defaultEnPageTranslations, frOverrides),
+  de: deepMerge<PageTranslations>(defaultEnPageTranslations, deOverrides),
+  zh: deepMerge<PageTranslations>(defaultEnPageTranslations, zhOverrides),
+  ja: deepMerge<PageTranslations>(defaultEnPageTranslations, jaOverrides),
+  ar: deepMerge<PageTranslations>(defaultEnPageTranslations, arOverrides),
+  pt: deepMerge<PageTranslations>(defaultEnPageTranslations, ptOverrides),
+  it: deepMerge<PageTranslations>(defaultEnPageTranslations, itOverrides),
+  ru: deepMerge<PageTranslations>(defaultEnPageTranslations, ruOverrides),
+};
+
+export const getPageTranslations = (lang: LanguageCode): PageTranslations => {
+  return pageTranslations[lang] || defaultEnPageTranslations;
 };

@@ -1,7 +1,20 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useApp } from '../../context/AppContext';
-import { MessageSquare, X, Send, Bot, User, ShieldCheck, ChevronRight, Clock, HelpCircle, ExternalLink } from 'lucide-react';
+import { 
+  MessageSquare, 
+  X, 
+  Send, 
+  Bot, 
+  ShieldCheck, 
+  ChevronRight, 
+  Key, 
+  Sparkles, 
+  CheckCircle2, 
+  Settings,
+  ExternalLink 
+} from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { isSmartsuppConfigured, openSmartsuppChat, initSmartsupp } from '../../services/smartsuppService';
 
 interface ChatMessage {
   id: string;
@@ -12,11 +25,20 @@ interface ChatMessage {
 }
 
 export const SmartsuppWidget: React.FC = () => {
-  const { user, t, currentRoute, setCurrentRoute, createNewTicket } = useApp();
+  const { user, t, currentRoute, setCurrentRoute, createNewTicket, openSmartsuppModal } = useApp();
   const [isOpen, setIsOpen] = useState(false);
   const [inputVal, setInputVal] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const isConfigured = isSmartsuppConfigured();
+
+  // Initialize Smartsupp when configured
+  useEffect(() => {
+    if (isConfigured) {
+      initSmartsupp(user);
+    }
+  }, [isConfigured, user]);
 
   // Initial canned conversation conforming to TradeVerge specification pages 6-9
   const [messages, setMessages] = useState<ChatMessage[]>([
@@ -160,9 +182,17 @@ export const SmartsuppWidget: React.FC = () => {
           <div className="text-left hidden sm:block">
             <div className="text-xs font-semibold text-white tracking-wide flex items-center gap-1.5">
               <span>Client Concierge</span>
-              <span className="text-[10px] px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-400 font-mono">Live</span>
+              <span className={`text-[10px] px-1.5 py-0.2 rounded font-mono ${
+                isConfigured 
+                  ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' 
+                  : 'bg-amber-500/20 text-amber-400'
+              }`}>
+                {isConfigured ? 'Smartsupp Active' : 'Live Concierge'}
+              </span>
             </div>
-            <div className="text-[10px] text-gray-400">Smartsupp Protocol Active</div>
+            <div className="text-[10px] text-gray-400 flex items-center gap-1">
+              <span>{isConfigured ? 'Live Chat Ready' : 'Smartsupp Key Pending'}</span>
+            </div>
           </div>
         </motion.button>
       )}
@@ -175,7 +205,7 @@ export const SmartsuppWidget: React.FC = () => {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.96 }}
             transition={{ duration: 0.2 }}
-            className="w-[92vw] sm:w-[380px] h-[520px] bg-[#050505] border border-white/10 rounded-3xl shadow-2xl flex flex-col overflow-hidden backdrop-blur-2xl"
+            className="w-[92vw] sm:w-[380px] h-[540px] bg-[#050505] border border-white/10 rounded-3xl shadow-2xl flex flex-col overflow-hidden backdrop-blur-2xl"
           >
             {/* Header */}
             <div className="bg-[#0a0a0a] border-b border-white/10 px-4 py-3.5 flex items-center justify-between">
@@ -189,17 +219,45 @@ export const SmartsuppWidget: React.FC = () => {
                     <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
                   </h4>
                   <p className="text-[10px] text-gray-400 flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
-                    <span>Operations Desk & Support Active</span>
+                    <span className={`w-1.5 h-1.5 rounded-full ${isConfigured ? 'bg-emerald-400' : 'bg-amber-400'}`}></span>
+                    <span>{isConfigured ? 'Smartsupp Operator Active' : 'Automated Desk & Smartsupp Ready'}</span>
                   </p>
                 </div>
               </div>
+              <div className="flex items-center gap-1">
+                <button
+                  type="button"
+                  onClick={() => openSmartsuppModal()}
+                  className="p-1.5 rounded-lg text-amber-400 hover:text-white hover:bg-white/10 transition-colors"
+                  title="Configure Smartsupp Key"
+                >
+                  <Key className="w-3.5 h-3.5" />
+                </button>
+                <button
+                  onClick={() => setIsOpen(false)}
+                  className="p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition-colors"
+                  aria-label="Close Concierge"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+
+            {/* Smartsupp Status & Key Banner */}
+            <div className="bg-[#0a0a0a]/90 border-b border-white/10 px-3.5 py-2 flex items-center justify-between text-[10px]">
+              <div className="flex items-center gap-1.5">
+                <MessageSquare className="w-3.5 h-3.5 text-amber-400" />
+                <span className="text-gray-300">
+                  {isConfigured ? 'Smartsupp Live Chat is connected' : 'Smartsupp Key: Pending your input'}
+                </span>
+              </div>
               <button
-                onClick={() => setIsOpen(false)}
-                className="p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition-colors"
-                aria-label="Close Concierge"
+                type="button"
+                onClick={() => openSmartsuppModal()}
+                className="text-[10px] text-amber-400 hover:underline font-mono flex items-center gap-1"
               >
-                <X className="w-4 h-4" />
+                <span>{isConfigured ? 'Manage Key' : 'Add Key'}</span>
+                <ChevronRight className="w-3 h-3" />
               </button>
             </div>
 
