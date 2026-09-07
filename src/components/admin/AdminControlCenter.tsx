@@ -26,7 +26,8 @@ import {
   QrCode,
   Globe,
   MessageSquare,
-  Key
+  Key,
+  Database
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -54,7 +55,9 @@ export const AdminControlCenter: React.FC = () => {
     auditLogs,
     showToast,
     openTranslateModal,
-    openSmartsuppModal
+    openSmartsuppModal,
+    openSupabaseModal,
+    isSupabaseLinked
   } = useApp();
 
   type AdminTab = 'payments' | 'deposits' | 'withdrawals' | 'kyc' | 'plans' | 'campaigns' | 'audit';
@@ -193,6 +196,18 @@ export const AdminControlCenter: React.FC = () => {
           >
             <MessageSquare className="w-3.5 h-3.5 text-amber-400" />
             <span>Smartsupp Key</span>
+          </button>
+          <button
+            onClick={openSupabaseModal}
+            className={`flex items-center gap-1.5 px-3 py-2 rounded-xl border text-xs font-semibold transition-all cursor-pointer ${
+              isSupabaseLinked
+                ? 'bg-emerald-500/15 border-emerald-500/40 text-emerald-300 hover:bg-emerald-500/25'
+                : 'bg-amber-500/15 border-amber-500/40 text-amber-300 hover:bg-amber-500/25'
+            }`}
+            title="Configure Supabase Database"
+          >
+            <Database className="w-3.5 h-3.5" />
+            <span>{isSupabaseLinked ? 'Database Connected' : 'Connect Supabase'}</span>
           </button>
           <button
             onClick={() => {

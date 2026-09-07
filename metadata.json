@@ -1,6 +1,6 @@
 {
   "name": "TradeVerge.live - Institutional & Private Wealth Investment Platform",
-  "description": "Comprehensive institutional and private-wealth investment platform with multi-currency manual banking and crypto payment gateways, automated allocation, KYC/AML onboarding, Google email verification, Google Cloud Translator key integration, and Smartsupp live chat support.",
+  "description": "Comprehensive institutional and private-wealth investment platform with multi-currency manual banking and crypto payment gateways, automated allocation, KYC/AML onboarding, Google email verification, Smartsupp live chat support, and custom Supabase database synchronization.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

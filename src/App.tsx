@@ -9,6 +9,7 @@ import { AdminAccessGuard } from './components/admin/AdminAccessGuard';
 import { EmailDispatchModal } from './components/shared/EmailDispatchModal';
 import { GoogleEmailVerificationModal } from './components/auth/GoogleEmailVerificationModal';
 import { SmartsuppConfigModal } from './components/support/SmartsuppConfigModal';
+import { SupabaseConfigModal } from './components/database/SupabaseConfigModal';
 
 // Public Pages
 import { HomePage } from './components/public/HomePage';
@@ -50,7 +51,10 @@ const AppContent: React.FC = () => {
     isGoogleVerifyModalOpen,
     closeGoogleVerifyModal,
     isSmartsuppModalOpen,
-    closeSmartsuppModal
+    closeSmartsuppModal,
+    isSupabaseModalOpen,
+    closeSupabaseModal,
+    syncWithSupabase
   } = useApp();
 
   // Scroll to top upon route change
@@ -157,6 +161,15 @@ const AppContent: React.FC = () => {
       <SmartsuppConfigModal
         isOpen={isSmartsuppModalOpen}
         onClose={closeSmartsuppModal}
+      />
+
+      {/* Supabase Database Connection Modal */}
+      <SupabaseConfigModal
+        isOpen={isSupabaseModalOpen}
+        onClose={closeSupabaseModal}
+        onConnected={() => {
+          syncWithSupabase();
+        }}
       />
 
       {/* Smartsupp AI Concierge Widget (Hidden on Admin) */}

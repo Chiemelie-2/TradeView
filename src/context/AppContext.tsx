@@ -23,6 +23,10 @@ import {
 } from '../services/emailService';
 import { initSmartsupp } from '../services/smartsuppService';
 import { 
+  isSupabaseConfigured, 
+  supabaseDb 
+} from '../lib/supabase';
+import { 
   initialUserProfile, 
   initialAdminProfile,
   initialPaymentMethods, 
@@ -95,6 +99,11 @@ interface AppContextType {
   isTranslateModalOpen: boolean;
   openTranslateModal: () => void;
   closeTranslateModal: () => void;
+  isSupabaseModalOpen: boolean;
+  openSupabaseModal: () => void;
+  closeSupabaseModal: () => void;
+  isSupabaseLinked: boolean;
+  syncWithSupabase: () => Promise<void>;
   verifyUserEmail: (code?: string) => { success: boolean; message: string };
   logout: () => void;
   isAuthModalOpen: boolean;
@@ -334,6 +343,85 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [isTranslateModalOpen, setIsTranslateModalOpen] = useState(false);
   const openTranslateModal = () => setIsTranslateModalOpen(true);
   const closeTranslateModal = () => setIsTranslateModalOpen(false);
+
+  const [isSupabaseModalOpen, setIsSupabaseModalOpen] = useState(false);
+  const openSupabaseModal = () => setIsSupabaseModalOpen(true);
+  const closeSupabaseModal = () => setIsSupabaseModalOpen(false);
+  const [isSupabaseLinked, setIsSupabaseLinked] = useState(() => isSupabaseConfigured());
+
+  const syncWithSupabase = async () => {
+    if (!isSupabaseConfigured()) {
+      setIsSupabaseLinked(false);
+      return;
+    }
+    try {
+      setIsSupabaseLinked(true);
+      const [
+        sbPlans,
+        sbMethods,
+        sbDeposits,
+        sbWithdrawals,
+        sbInvestments,
+        sbTxs,
+        sbKyc,
+        sbNotifs,
+        sbAudit,
+        sbCampaigns
+      ] = await Promise.allSettled([
+        supabaseDb.investmentPlans.getAll(),
+        supabaseDb.paymentMethods.getAll(),
+        supabaseDb.deposits.getAll(),
+        supabaseDb.withdrawals.getAll(),
+        supabaseDb.investments.getAll(),
+        supabaseDb.transactions.getAll(),
+        supabaseDb.kyc.getAll(),
+        supabaseDb.notifications.getAll(),
+        supabaseDb.auditLogs.getAll(),
+        supabaseDb.campaigns.getAll()
+      ]);
+
+      if (sbPlans.status === 'fulfilled' && sbPlans.value && sbPlans.value.length > 0) {
+        setPlans(sbPlans.value);
+      }
+      if (sbMethods.status === 'fulfilled' && sbMethods.value && sbMethods.value.length > 0) {
+        setPaymentMethods(sbMethods.value.map(normalizeMethod));
+      }
+      if (sbDeposits.status === 'fulfilled' && sbDeposits.value) {
+        setDeposits(sbDeposits.value);
+      }
+      if (sbWithdrawals.status === 'fulfilled' && sbWithdrawals.value) {
+        setWithdrawals(sbWithdrawals.value);
+      }
+      if (sbInvestments.status === 'fulfilled' && sbInvestments.value) {
+        setInvestments(sbInvestments.value);
+      }
+      if (sbTxs.status === 'fulfilled' && sbTxs.value) {
+        setLedgerTransactions(sbTxs.value);
+      }
+      if (sbKyc.status === 'fulfilled' && sbKyc.value) {
+        setKycCases(sbKyc.value);
+      }
+      if (sbNotifs.status === 'fulfilled' && sbNotifs.value) {
+        setNotifications(sbNotifs.value);
+      }
+      if (sbAudit.status === 'fulfilled' && sbAudit.value) {
+        setAuditLogs(sbAudit.value);
+      }
+      if (sbCampaigns.status === 'fulfilled' && sbCampaigns.value && sbCampaigns.value.length > 0) {
+        setCampaigns(sbCampaigns.value);
+      }
+      
+      showToast('Supabase Connected', 'Live records synchronized with your Supabase database.', 'success');
+    } catch (err: any) {
+      console.warn('Supabase sync error:', err);
+    }
+  };
+
+  useEffect(() => {
+    if (isSupabaseConfigured()) {
+      syncWithSupabase();
+    }
+  }, []);
 
   const verifyUserEmail = (_code?: string) => {
     setUser(prev => ({
@@ -648,6 +736,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     };
     setAuditLogs(prev => [audit, ...prev]);
     showToast('Payment Gateway Created', `Method "${newMethod.name}" published for investor funding.`, 'success');
+
+    if (isSupabaseConfigured()) {
+      supabaseDb.paymentMethods.create(newMethod).catch(err => console.warn('Supabase method write error:', err));
+      supabaseDb.auditLogs.create(audit).catch(err => console.warn('Supabase audit write error:', err));
+    }
   };
 
   const updatePaymentMethod = (id: string, updates: Partial<PaymentMethod>) => {
@@ -766,6 +859,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     };
     setAuditLogs(prev => [audit, ...prev]);
     showToast('Deposit Submitted', 'Your payment proof has entered the compliance verification queue.', 'success');
+
+    if (isSupabaseConfigured()) {
+      supabaseDb.deposits.create(newSubmission).catch(err => console.warn('Supabase deposit write error:', err));
+      supabaseDb.notifications.create(newNotif).catch(err => console.warn('Supabase notif write error:', err));
+      supabaseDb.auditLogs.create(audit).catch(err => console.warn('Supabase audit write error:', err));
+    }
   };
 
   // Admin Approve Deposit
@@ -833,6 +932,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setAuditLogs(prev => [audit, ...prev]);
 
     showToast('Deposit Approved', `$${target.amount.toLocaleString()} credited to investor ledger.`, 'success');
+
+    if (isSupabaseConfigured()) {
+      supabaseDb.deposits.updateStatus(id, 'posted', notes).catch(err => console.warn('Supabase deposit update error:', err));
+      supabaseDb.transactions.create(newTx).catch(err => console.warn('Supabase tx create error:', err));
+      supabaseDb.notifications.create(notif).catch(err => console.warn('Supabase notif create error:', err));
+      supabaseDb.auditLogs.create(audit).catch(err => console.warn('Supabase audit create error:', err));
+    }
   };
 
   // Admin Reject Deposit
@@ -940,6 +1046,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setNotifications(prev => [notif, ...prev]);
 
     showToast('Investment Activated', `Allocated $${amount.toLocaleString()} to ${plan.name}.`, 'success');
+
+    if (isSupabaseConfigured()) {
+      supabaseDb.investments.create(newInvestment).catch(err => console.warn('Supabase investment create error:', err));
+      supabaseDb.transactions.create(newTx).catch(err => console.warn('Supabase tx create error:', err));
+      supabaseDb.notifications.create(notif).catch(err => console.warn('Supabase notif create error:', err));
+    }
+
     return { success: true, message: 'Investment successfully active' };
   };
 
@@ -984,6 +1097,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setLedgerTransactions(prev => [newTx, ...prev]);
 
     showToast('Withdrawal Requested', `Withdrawal of $${amount.toLocaleString()} submitted for compliance review.`, 'info');
+
+    if (isSupabaseConfigured()) {
+      supabaseDb.withdrawals.create(newWithdrawal).catch(err => console.warn('Supabase withdrawal create error:', err));
+      supabaseDb.transactions.create(newTx).catch(err => console.warn('Supabase tx create error:', err));
+    }
+
     return { success: true, message: 'Withdrawal successfully queued' };
   };
 
@@ -995,12 +1114,23 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setLedgerTransactions(prev => prev.map(tx => tx.referenceId === id ? { ...tx, status: 'completed' } : tx));
 
     showToast('Withdrawal Dispatched', `Withdrawal of $${target.amount.toLocaleString()} settled and dispatched.`, 'success');
+
+    if (isSupabaseConfigured()) {
+      supabaseDb.withdrawals.updateStatus(id, 'processed').catch(err => console.warn('Supabase withdrawal update error:', err));
+    }
   };
 
   const adminRejectWithdrawal = (id: string) => {
+    const target = withdrawals.find(w => w.id === id);
+    if (!target) return;
+
     setWithdrawals(prev => prev.map(w => w.id === id ? { ...w, status: 'rejected', reviewedBy: 'Compliance Officer', reviewedAt: new Date().toISOString() } : w));
     setLedgerTransactions(prev => prev.map(tx => tx.referenceId === id ? { ...tx, status: 'failed' } : tx));
     showToast('Withdrawal Rejected', 'Funds returned to investor available balance.', 'warning');
+
+    if (isSupabaseConfigured()) {
+      supabaseDb.withdrawals.updateStatus(id, 'rejected').catch(err => console.warn('Supabase withdrawal update error:', err));
+    }
   };
 
   // KYC
@@ -1026,6 +1156,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setKycCases(prev => [newCase, ...prev]);
     setUser(prev => ({ ...prev, kycStatus: 'submitted' }));
     showToast('KYC Submitted', 'Your documents have been securely uploaded for compliance review.', 'success');
+
+    if (isSupabaseConfigured()) {
+      supabaseDb.kyc.submit(newCase).catch(err => console.warn('Supabase kyc create error:', err));
+    }
   };
 
   const adminApproveKyc = (caseId: string) => {
@@ -1037,11 +1171,19 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       setUser(prev => ({ ...prev, kycStatus: 'approved', kycTier: 2 }));
     }
     showToast('KYC Case Approved', `Investor ${target.fullName} is now Tier 2 approved.`, 'success');
+
+    if (isSupabaseConfigured()) {
+      supabaseDb.kyc.updateStatus(caseId, 'approved').catch(err => console.warn('Supabase kyc update error:', err));
+    }
   };
 
   const adminRejectKyc = (caseId: string, reason: string) => {
     setKycCases(prev => prev.map(k => k.id === caseId ? { ...k, status: 'rejected', rejectionReason: reason, reviewedAt: new Date().toISOString() } : k));
     showToast('KYC Case Rejected', `Reason: ${reason}`, 'warning');
+
+    if (isSupabaseConfigured()) {
+      supabaseDb.kyc.updateStatus(caseId, 'rejected', reason).catch(err => console.warn('Supabase kyc update error:', err));
+    }
   };
 
   const markNotificationAsRead = (id: string) => {
@@ -1124,6 +1266,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         isTranslateModalOpen,
         openTranslateModal,
         closeTranslateModal,
+        isSupabaseModalOpen,
+        openSupabaseModal,
+        closeSupabaseModal,
+        isSupabaseLinked,
+        syncWithSupabase,
         verifyUserEmail,
         logout,
         isAuthModalOpen,

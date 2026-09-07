@@ -16,6 +16,7 @@ import {
   Plus
 } from 'lucide-react';
 import { motion } from 'motion/react';
+import { PortfolioGrowthChart } from './PortfolioGrowthChart';
 
 export const InvestorDashboard: React.FC = () => {
   const { 
@@ -33,32 +34,6 @@ export const InvestorDashboard: React.FC = () => {
     openEmailModal,
     openSmartsuppModal
   } = useApp();
-
-  const [timeframe, setTimeframe] = useState<'1W' | '1M' | '1Y' | 'ALL'>('1M');
-
-  // Chart coordinate points for realistic smooth growth line
-  const chartPoints = [
-    { label: 'Aug 01', value: 35000 },
-    { label: 'Aug 08', value: 38400 },
-    { label: 'Aug 15', value: 41200 },
-    { label: 'Aug 22', value: 44100 },
-    { label: 'Aug 29', value: 47900 },
-    { label: 'Sep 04', value: Math.max(49000, totalPortfolioValue) }
-  ];
-
-  const minVal = Math.min(...chartPoints.map(p => p.value));
-  const maxVal = Math.max(...chartPoints.map(p => p.value));
-
-  const getSvgY = (val: number) => {
-    const range = maxVal - minVal || 1;
-    return 160 - ((val - minVal) / range) * 120;
-  };
-
-  const pathD = chartPoints.reduce((acc, pt, idx) => {
-    const x = 40 + idx * 140;
-    const y = getSvgY(pt.value);
-    return idx === 0 ? `M ${x} ${y}` : `${acc} L ${x} ${y}`;
-  }, '');
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
@@ -244,75 +219,8 @@ export const InvestorDashboard: React.FC = () => {
         </button>
       </div>
 
-      {/* Interactive Portfolio Performance Graph */}
-      <div className="p-6 rounded-2xl bg-[#0a0a0a] border border-white/10 space-y-6 shadow-2xl">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-4">
-          <div>
-            <span className="text-[11px] font-mono uppercase tracking-wider text-amber-500">
-              Depository Valuation Curve
-            </span>
-            <h3 className="font-serif text-xl font-bold text-white">Historical Portfolio Trajectory</h3>
-          </div>
-          <div className="flex items-center gap-1 bg-[#050505] p-1 rounded-lg border border-white/10">
-            {(['1W', '1M', '1Y', 'ALL'] as const).map((tf) => (
-              <button
-                key={tf}
-                onClick={() => setTimeframe(tf)}
-                className={`px-3 py-1 rounded-md text-xs font-mono font-semibold transition-all ${
-                  timeframe === tf ? 'bg-amber-500 text-black font-bold' : 'text-gray-400 hover:text-white'
-                }`}
-              >
-                {tf}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* SVG Curve Display */}
-        <div className="w-full h-48 overflow-hidden relative">
-          <svg className="w-full h-full" viewBox="0 0 780 180" preserveAspectRatio="none">
-            <defs>
-              <linearGradient id="curveGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#f59e0b" stopOpacity="0.25" />
-                <stop offset="100%" stopColor="#f59e0b" stopOpacity="0.0" />
-              </linearGradient>
-            </defs>
-            {/* Area Fill */}
-            <path
-              d={`${pathD} L 740 180 L 40 180 Z`}
-              fill="url(#curveGradient)"
-            />
-            {/* Stroke Line */}
-            <path
-              d={pathD}
-              fill="none"
-              stroke="#f59e0b"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-            {/* Data point dots */}
-            {chartPoints.map((pt, idx) => (
-              <circle
-                key={idx}
-                cx={40 + idx * 140}
-                cy={getSvgY(pt.value)}
-                r="4.5"
-                fill="#050505"
-                stroke="#f59e0b"
-                strokeWidth="2"
-              />
-            ))}
-          </svg>
-        </div>
-
-        {/* Timeline Labels */}
-        <div className="flex justify-between text-[11px] text-gray-500 font-mono border-t border-white/10 pt-2">
-          {chartPoints.map((pt, idx) => (
-            <span key={idx}>{pt.label}</span>
-          ))}
-        </div>
-      </div>
+      {/* Interactive Recharts Portfolio Performance Visualization */}
+      <PortfolioGrowthChart />
 
       {/* Active Investment Positions Table */}
       <div className="space-y-4">

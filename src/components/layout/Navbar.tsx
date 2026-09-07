@@ -22,7 +22,8 @@ import {
   BadgeCheck,
   Mail,
   CheckCircle2,
-  MessageSquare
+  MessageSquare,
+  Database
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { GoogleTranslateModal } from '../shared/GoogleTranslateModal';
@@ -44,7 +45,9 @@ export const Navbar: React.FC = () => {
     markNotificationAsRead,
     openEmailModal,
     openGoogleVerifyModal,
-    openSmartsuppModal
+    openSmartsuppModal,
+    openSupabaseModal,
+    isSupabaseLinked
   } = useApp();
 
   const pageT = pageTranslations[language] || pageTranslations.en;
@@ -134,6 +137,19 @@ export const Navbar: React.FC = () => {
                 {isAdmin ? 'Clearance Level 4: Marcus Vance (CCO)' : 'Tier 1 Institutional Custody'}
               </span>
             </div>
+
+            <button
+              onClick={openSupabaseModal}
+              className={`text-[9px] sm:text-[10px] font-mono px-2 py-0.5 rounded border transition-colors flex items-center gap-1.5 cursor-pointer shrink-0 ${
+                isSupabaseLinked 
+                  ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-300 hover:bg-emerald-500/25' 
+                  : 'bg-amber-500/15 border-amber-500/30 text-amber-300 hover:bg-amber-500/25'
+              }`}
+              title="Link Supabase Database"
+            >
+              <Database className="w-2.5 h-2.5 shrink-0" />
+              <span>{isSupabaseLinked ? 'Supabase: Connected' : 'Link Supabase'}</span>
+            </button>
 
             {isAdmin ? (
               <button
