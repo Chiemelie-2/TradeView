@@ -15,9 +15,12 @@ import {
   Sliders, 
   FileCheck,
   Building2,
-  ExternalLink
+  ExternalLink,
+  Activity,
+  Shield
 } from 'lucide-react';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
+import { HeroAnimationVisual } from './HeroAnimationVisual';
 
 export const HomePage: React.FC = () => {
   const { 
@@ -83,44 +86,119 @@ export const HomePage: React.FC = () => {
         </div>
       ))}
 
-      {/* Hero Section */}
-      <section className="relative pt-12 lg:pt-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <div className="text-center max-w-4xl mx-auto space-y-6">
+      {/* Hero Section with Professional Modern Animations */}
+      <section className="relative pt-12 lg:pt-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto overflow-hidden">
+        {/* Ambient Animated Architectural Lighting & Geometric Grid */}
+        <div className="absolute inset-0 pointer-events-none -z-10">
+          {/* Subtle Institutional Grid with Radial Falloff Mask */}
+          <div 
+            className="absolute inset-0 opacity-[0.035]"
+            style={{
+              backgroundImage: 'linear-gradient(to right, #ffffff 1px, transparent 1px), linear-gradient(to bottom, #ffffff 1px, transparent 1px)',
+              backgroundSize: '48px 48px',
+              maskImage: 'radial-gradient(ellipse 70% 60% at 50% 30%, #000 30%, transparent 80%)',
+              WebkitMaskImage: 'radial-gradient(ellipse 70% 60% at 50% 30%, #000 30%, transparent 80%)'
+            }}
+          />
+
+          {/* Floating Warm Amber Ambient Light Core */}
+          <motion.div 
+            animate={{ 
+              x: [0, 40, -30, 0], 
+              y: [0, -30, 15, 0],
+              scale: [1, 1.12, 0.95, 1],
+              opacity: [0.12, 0.18, 0.14, 0.12]
+            }}
+            transition={{ duration: 16, repeat: Infinity, ease: 'easeInOut' }}
+            className="absolute top-10 left-1/2 -translate-x-1/2 w-[540px] h-[360px] bg-gradient-to-b from-amber-500/20 to-amber-600/5 rounded-full blur-[110px]"
+          />
+
+          {/* Subtle Slate Counter-Glow */}
+          <motion.div 
+            animate={{ 
+              x: [0, -30, 20, 0], 
+              y: [0, 20, -25, 0],
+              opacity: [0.06, 0.11, 0.08, 0.06]
+            }}
+            transition={{ duration: 18, repeat: Infinity, ease: 'easeInOut' }}
+            className="absolute top-48 right-1/4 w-[420px] h-[280px] bg-stone-400/10 rounded-full blur-[90px]"
+          />
+        </div>
+
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6 }}
+          className="text-center max-w-4xl mx-auto space-y-6 relative z-10"
+        >
+          {/* Animated Tagline Pill with Live Pulse Beacon */}
           <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
-            className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#0a0a0a] border border-white/10 text-amber-500 text-xs font-mono tracking-wider uppercase"
+            initial={{ opacity: 0, y: 14, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+            className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-[#0a0a0a]/90 border border-white/15 text-amber-400 text-xs font-mono tracking-wider uppercase shadow-lg shadow-black/40 backdrop-blur-md"
           >
+            <div className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500" />
+            </div>
             <Sparkles className="w-3.5 h-3.5 text-amber-500" />
             <span>{t.hero.tagline}</span>
           </motion.div>
 
+          {/* High-Contrast Typographic Headline */}
           <motion.h1
-            initial={{ opacity: 0, y: 16 }}
+            initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
+            transition={{ duration: 0.6, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
             className="font-serif text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-white leading-[1.08]"
           >
             {t.hero.headline}
           </motion.h1>
 
+          {/* Subheadline with Refined Readability */}
           <motion.p
-            initial={{ opacity: 0, y: 16 }}
+            initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="text-gray-300 text-base sm:text-lg lg:text-xl max-w-2xl mx-auto leading-relaxed font-light"
+            transition={{ duration: 0.6, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+            className="text-stone-300 text-base sm:text-lg lg:text-xl max-w-2xl mx-auto leading-relaxed font-light"
           >
             {t.hero.subheadline}
           </motion.p>
 
+          {/* Live Institutional Security Framework Strip */}
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-            className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-3.5"
+            transition={{ duration: 0.5, delay: 0.25 }}
+            className="flex flex-wrap items-center justify-center gap-2 pt-1 text-[11px] font-mono text-stone-400"
           >
-            <button
+            <span className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white/[0.03] border border-white/10">
+              <ShieldCheck className="w-3 h-3 text-emerald-400" />
+              Tier-1 Segregated Depository
+            </span>
+            <span className="hidden sm:inline text-stone-600">•</span>
+            <span className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white/[0.03] border border-white/10">
+              <Lock className="w-3 h-3 text-amber-400" />
+              Multi-Sig Vault Cold Storage
+            </span>
+            <span className="hidden sm:inline text-stone-600">•</span>
+            <span className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white/[0.03] border border-white/10">
+              <Activity className="w-3 h-3 text-amber-400" />
+              Double-Entry Merkle Audit
+            </span>
+          </motion.div>
+
+          {/* Animated Call to Action Buttons */}
+          <motion.div
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
+            className="pt-3 flex flex-col sm:flex-row items-center justify-center gap-3.5"
+          >
+            <motion.button
+              whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
+              whileTap={{ scale: 0.98 }}
               onClick={() => {
                 if (!isAuthenticated) {
                   openAuthModal('register', 'investor');
@@ -128,56 +206,103 @@ export const HomePage: React.FC = () => {
                   setCurrentRoute('dashboard');
                 }
               }}
-              className="w-full sm:w-auto px-8 py-3.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-black font-bold text-xs uppercase tracking-wider shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer"
+              className="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-bold text-xs uppercase tracking-wider shadow-xl shadow-amber-500/20 transition-all flex items-center justify-center gap-2 cursor-pointer"
             >
               <span>{t.hero.startInvesting}</span>
               <ArrowRight className="w-4 h-4" />
-            </button>
+            </motion.button>
 
-            <button
+            <motion.button
+              whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
+              whileTap={{ scale: 0.98 }}
               onClick={() => setCurrentRoute('investments')}
-              className="w-full sm:w-auto px-7 py-3.5 rounded-lg bg-[#0f0f0f] hover:bg-white/5 text-gray-200 font-semibold text-xs uppercase tracking-wider border border-white/10 transition-all flex items-center justify-center gap-2 cursor-pointer"
+              className="w-full sm:w-auto px-7 py-3.5 rounded-xl bg-[#0e0e11] hover:bg-white/10 text-stone-200 font-semibold text-xs uppercase tracking-wider border border-white/15 transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm"
             >
               <span>{t.hero.explorePlans}</span>
-              <Layers className="w-4 h-4" />
-            </button>
+              <Layers className="w-4 h-4 text-amber-400" />
+            </motion.button>
 
-            <button
+            <motion.button
+              whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
+              whileTap={{ scale: 0.98 }}
               onClick={() => setCurrentRoute('deposit')}
-              className="w-full sm:w-auto px-6 py-3.5 rounded-lg bg-white/5 hover:bg-white/10 text-gray-200 font-medium text-xs uppercase tracking-wider border border-white/10 transition-all flex items-center justify-center gap-2 cursor-pointer"
+              className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-white/5 hover:bg-white/10 text-stone-200 font-medium text-xs uppercase tracking-wider border border-white/15 transition-all flex items-center justify-center gap-2 cursor-pointer"
             >
               <span>Fund Account (Bank / Crypto)</span>
-            </button>
+            </motion.button>
+          </motion.div>
+        </motion.div>
+
+        {/* Live Interactive Depository Console & Animated Performance Matrix */}
+        <HeroAnimationVisual />
+
+        {/* Animated Key Statistics Grid */}
+        <motion.div 
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
+          className="pt-10 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-5xl mx-auto relative z-10"
+        >
+          <motion.div 
+            whileHover={{ y: -4, borderColor: 'rgba(245, 158, 11, 0.4)', transition: { duration: 0.2 } }}
+            className="p-5 rounded-2xl bg-[#0a0a0d]/90 border border-white/10 text-center shadow-lg backdrop-blur-sm relative overflow-hidden group"
+          >
+            <div className="absolute top-0 right-0 w-16 h-16 bg-amber-500/5 rounded-full blur-xl group-hover:bg-amber-500/15 transition-all" />
+            <div className="flex items-center justify-center gap-1.5 mb-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="text-[10px] text-stone-400 uppercase tracking-widest font-mono">Assets Under Custody</span>
+            </div>
+            <span className="block font-serif text-2xl sm:text-3xl font-bold text-white tracking-tight">
+              {t.hero.statsAum}
+            </span>
+            <span className="text-[9px] font-mono text-emerald-400 mt-1 inline-block">100% Off-Balance Sheet</span>
           </motion.div>
 
-          {/* Key Statistics Grid */}
-          <div className="pt-12 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
-            <div className="p-4 rounded-xl bg-[#0a0a0a] border border-white/10 text-center">
-              <span className="block font-serif text-2xl sm:text-3xl font-bold text-white tracking-tight">
-                {t.hero.statsAum}
-              </span>
-              <span className="text-[10px] text-gray-500 uppercase tracking-widest font-mono">Assets Under Custody</span>
+          <motion.div 
+            whileHover={{ y: -4, borderColor: 'rgba(245, 158, 11, 0.4)', transition: { duration: 0.2 } }}
+            className="p-5 rounded-2xl bg-[#0a0a0d]/90 border border-white/10 text-center shadow-lg backdrop-blur-sm relative overflow-hidden group"
+          >
+            <div className="absolute top-0 right-0 w-16 h-16 bg-amber-500/5 rounded-full blur-xl group-hover:bg-amber-500/15 transition-all" />
+            <div className="flex items-center justify-center gap-1.5 mb-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+              <span className="text-[10px] text-stone-400 uppercase tracking-widest font-mono">Qualified Investors</span>
             </div>
-            <div className="p-4 rounded-xl bg-[#0a0a0a] border border-white/10 text-center">
-              <span className="block font-serif text-2xl sm:text-3xl font-bold text-amber-500 tracking-tight">
-                {t.hero.statsInvestors}
-              </span>
-              <span className="text-[10px] text-gray-500 uppercase tracking-widest font-mono">Qualified Investors</span>
+            <span className="block font-serif text-2xl sm:text-3xl font-bold text-amber-500 tracking-tight">
+              {t.hero.statsInvestors}
+            </span>
+            <span className="text-[9px] font-mono text-stone-400 mt-1 inline-block">Institutional & Private</span>
+          </motion.div>
+
+          <motion.div 
+            whileHover={{ y: -4, borderColor: 'rgba(245, 158, 11, 0.4)', transition: { duration: 0.2 } }}
+            className="p-5 rounded-2xl bg-[#0a0a0d]/90 border border-white/10 text-center shadow-lg backdrop-blur-sm relative overflow-hidden group"
+          >
+            <div className="absolute top-0 right-0 w-16 h-16 bg-amber-500/5 rounded-full blur-xl group-hover:bg-amber-500/15 transition-all" />
+            <div className="flex items-center justify-center gap-1.5 mb-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+              <span className="text-[10px] text-stone-400 uppercase tracking-widest font-mono">Yield Distributed</span>
             </div>
-            <div className="p-4 rounded-xl bg-[#0a0a0a] border border-white/10 text-center">
-              <span className="block font-serif text-2xl sm:text-3xl font-bold text-amber-400 tracking-tight">
-                {t.hero.statsPayouts}
-              </span>
-              <span className="text-[10px] text-gray-500 uppercase tracking-widest font-mono">Yield Distributed</span>
+            <span className="block font-serif text-2xl sm:text-3xl font-bold text-amber-400 tracking-tight">
+              {t.hero.statsPayouts}
+            </span>
+            <span className="text-[9px] font-mono text-emerald-400 mt-1 inline-block">Daily Reconciled</span>
+          </motion.div>
+
+          <motion.div 
+            whileHover={{ y: -4, borderColor: 'rgba(245, 158, 11, 0.4)', transition: { duration: 0.2 } }}
+            className="p-5 rounded-2xl bg-[#0a0a0d]/90 border border-white/10 text-center shadow-lg backdrop-blur-sm relative overflow-hidden group"
+          >
+            <div className="absolute top-0 right-0 w-16 h-16 bg-amber-500/5 rounded-full blur-xl group-hover:bg-amber-500/15 transition-all" />
+            <div className="flex items-center justify-center gap-1.5 mb-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+              <span className="text-[10px] text-stone-400 uppercase tracking-widest font-mono">Reconciled Availability</span>
             </div>
-            <div className="p-4 rounded-xl bg-[#0a0a0a] border border-white/10 text-center">
-              <span className="block font-serif text-2xl sm:text-3xl font-bold text-gray-200 tracking-tight">
-                {t.hero.statsUptime}
-              </span>
-              <span className="text-[10px] text-gray-500 uppercase tracking-widest font-mono">Reconciled Availability</span>
-            </div>
-          </div>
-        </div>
+            <span className="block font-serif text-2xl sm:text-3xl font-bold text-stone-200 tracking-tight">
+              {t.hero.statsUptime}
+            </span>
+            <span className="text-[9px] font-mono text-stone-400 mt-1 inline-block">24/7 Redundant Vaults</span>
+          </motion.div>
+        </motion.div>
       </section>
 
       {/* Live Market & Capital Index Ticker */}
