@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
 import { 
   ShieldCheck, 
@@ -56,6 +56,17 @@ export const GoogleEmailVerificationModal: React.FC<GoogleEmailVerificationModal
   const [copied, setCopied] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
 
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
 
   const currentToken = lastDispatchedEmail?.verificationToken || 'SEC-GOOGLE-VERIFIED-9K4P';
@@ -85,11 +96,19 @@ export const GoogleEmailVerificationModal: React.FC<GoogleEmailVerificationModal
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-in fade-in">
+    <div 
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-in fade-in"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) {
+          onClose();
+        }
+      }}
+    >
       <motion.div 
         initial={{ opacity: 0, scale: 0.95, y: 10 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: 10 }}
+        onClick={(e) => e.stopPropagation()}
         className="bg-[#0d0d0d] border border-white/20 rounded-3xl w-full max-w-lg flex flex-col shadow-2xl overflow-hidden"
       >
         {/* Header */}
@@ -113,10 +132,14 @@ export const GoogleEmailVerificationModal: React.FC<GoogleEmailVerificationModal
           </div>
 
           <button 
+            type="button"
             onClick={onClose}
-            className="p-1.5 text-stone-400 hover:text-white rounded-lg hover:bg-white/10 transition-colors cursor-pointer"
+            className="flex items-center gap-1 px-2.5 py-1.5 text-stone-300 hover:text-white rounded-xl bg-white/5 hover:bg-white/15 border border-white/15 transition-colors cursor-pointer text-xs font-semibold"
+            aria-label="Close verification modal"
+            title="Close dialog (Esc)"
           >
-            <X className="w-5 h-5" />
+            <span>Close</span>
+            <X className="w-4 h-4 text-amber-400" />
           </button>
         </div>
 

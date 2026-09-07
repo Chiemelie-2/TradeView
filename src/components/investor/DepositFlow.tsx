@@ -74,7 +74,7 @@ export const DepositFlow: React.FC = () => {
   const [methodTab, setMethodTab] = useState<'bank' | 'crypto'>('bank');
 
   // Pre-deposit auth handlers
-  const handlePreDepositRegister = (e: React.FormEvent) => {
+  const handlePreDepositRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!regFullName.trim() || !regEmail.trim()) {
       showToast('Validation Error', 'Please enter your full legal name and email address.', 'warning');
@@ -86,18 +86,25 @@ export const DepositFlow: React.FC = () => {
     }
 
     setIsAuthSubmitting(true);
-    setTimeout(() => {
-      registerAccount(regFullName, regEmail, regAccountType, 'email', regPassword);
+    try {
+      const res = await registerAccount(regFullName, regEmail, regAccountType, 'email', regPassword);
       setIsAuthSubmitting(false);
-      showToast(
-        'Registration Confirmed',
-        `Official verification email dispatched to ${regEmail}. You may now proceed with funding.`,
-        'success'
-      );
-    }, 400);
+      if (res.success) {
+        showToast(
+          'Registration Confirmed',
+          `Official verification email dispatched to ${regEmail}. You may now proceed with funding.`,
+          'success'
+        );
+      } else {
+        showToast('Registration Error', res.message || 'Could not register account in database.', 'danger');
+      }
+    } catch (err: any) {
+      setIsAuthSubmitting(false);
+      showToast('Registration Error', err.message || 'Database error.', 'danger');
+    }
   };
 
-  const handlePreDepositLogin = (e: React.FormEvent) => {
+  const handlePreDepositLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!loginEmail.trim()) {
       showToast('Validation Error', 'Please enter your registered email address.', 'warning');
@@ -105,33 +112,30 @@ export const DepositFlow: React.FC = () => {
     }
 
     setIsAuthSubmitting(true);
-    setTimeout(() => {
-      const res = login(loginEmail, loginPassword, 'investor');
+    try {
+      const res = await login(loginEmail, loginPassword, 'investor');
       setIsAuthSubmitting(false);
       if (res.success) {
         showToast('Signed In', 'Welcome back! You may now select your funding method.', 'success');
       } else {
         showToast('Access Denied', res.message || 'Invalid email or password.', 'danger');
       }
-    }, 350);
+    } catch (err: any) {
+      setIsAuthSubmitting(false);
+      showToast('Login Error', err.message || 'Unable to communicate with database server.', 'danger');
+    }
   };
 
-  const handleQuickDemoInvestor = () => {
+  const handleGoogleAuth = async () => {
     setIsAuthSubmitting(true);
-    setTimeout(() => {
-      login('a.montgomery@vancecapital.org', 'demo123', 'investor');
+    try {
+      await loginWithGoogle('princesamuel0903@gmail.com', 'Samuel Prince');
       setIsAuthSubmitting(false);
-      showToast('Demo Access Granted', 'Authenticated as Sir Arthur Montgomery (Accredited Investor).', 'success');
-    }, 250);
-  };
-
-  const handleGoogleAuth = () => {
-    setIsAuthSubmitting(true);
-    setTimeout(() => {
-      loginWithGoogle('princesamuel0903@gmail.com', 'Samuel Prince');
+      showToast('Google Authenticated', 'Account verified and stored in database. Confirmation email dispatched.', 'success');
+    } catch (err: any) {
       setIsAuthSubmitting(false);
-      showToast('Google Authenticated', 'Account verified and confirmation email dispatched.', 'success');
-    }, 350);
+      showToast('Authentication Error', err.message || 'Google authentication failed.', 'danger');
+    }
   };
 
   const handleCopy = (text: string, keyName: string) => {
@@ -533,38 +537,24 @@ export const DepositFlow: React.FC = () => {
               )}
             </button>
 
-            {/* Quick Demo Access */}
+            {/* Alternative Verification Options */}
             <div className="pt-2 border-t border-white/10 space-y-2">
-              <div className="text-[10px] uppercase tracking-wider text-gray-500 font-bold text-center">
-                Instant Verification Options
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                <button
-                  type="button"
-                  onClick={handleQuickDemoInvestor}
-                  className="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-left transition-colors group cursor-pointer"
-                >
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-xs font-semibold text-white group-hover:text-amber-400">Demo Investor</span>
-                    <UserCheck className="w-3.5 h-3.5 text-emerald-400" />
-                  </div>
-                  <div className="text-[10px] text-gray-400 truncate">Sir Arthur Montgomery</div>
-                  <div className="text-[9px] text-gray-500 font-mono">Tier 2 Accredited</div>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={handleGoogleAuth}
-                  className="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-left transition-colors group cursor-pointer"
-                >
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-xs font-semibold text-white group-hover:text-blue-400">Google Auth</span>
+              <button
+                type="button"
+                onClick={handleGoogleAuth}
+                className="w-full p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-left transition-colors group cursor-pointer flex items-center justify-between"
+              >
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-semibold text-white group-hover:text-blue-400">Continue with Google Account</span>
                     <Sparkles className="w-3.5 h-3.5 text-blue-400" />
                   </div>
-                  <div className="text-[10px] text-gray-400 truncate">One-Click Verification</div>
-                  <div className="text-[9px] text-emerald-400 font-mono">Dispatches Email</div>
-                </button>
-              </div>
+                  <div className="text-[10px] text-gray-400">Synchronizes profile with database and sends confirmation</div>
+                </div>
+                <span className="text-[10px] text-emerald-400 font-mono bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
+                  Database Sync
+                </span>
+              </button>
             </div>
 
             {/* Switch to Register */}

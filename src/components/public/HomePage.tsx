@@ -20,7 +20,15 @@ import {
 import { motion } from 'motion/react';
 
 export const HomePage: React.FC = () => {
-  const { t, setCurrentRoute, plans, setSelectedPlanId, campaigns } = useApp();
+  const { 
+    t, 
+    setCurrentRoute, 
+    plans, 
+    setSelectedPlanId, 
+    campaigns,
+    isAuthenticated,
+    openAuthModal
+  } = useApp();
 
   // Interactive Yield Calculator state
   const [calcAmount, setCalcAmount] = useState<number>(25000);
@@ -113,7 +121,13 @@ export const HomePage: React.FC = () => {
             className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-3.5"
           >
             <button
-              onClick={() => setCurrentRoute('dashboard')}
+              onClick={() => {
+                if (!isAuthenticated) {
+                  openAuthModal('register', 'investor');
+                } else {
+                  setCurrentRoute('dashboard');
+                }
+              }}
               className="w-full sm:w-auto px-8 py-3.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-black font-bold text-xs uppercase tracking-wider shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer"
             >
               <span>{t.hero.startInvesting}</span>
@@ -667,8 +681,14 @@ export const HomePage: React.FC = () => {
           </p>
           <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
             <button
-              onClick={() => setCurrentRoute('dashboard')}
-              className="px-8 py-3.5 rounded-lg bg-amber-500 text-black hover:bg-amber-400 font-bold text-xs uppercase tracking-wider shadow-xl transition-all"
+              onClick={() => {
+                if (!isAuthenticated) {
+                  openAuthModal('register', 'investor');
+                } else {
+                  setCurrentRoute('dashboard');
+                }
+              }}
+              className="px-8 py-3.5 rounded-lg bg-amber-500 text-black hover:bg-amber-400 font-bold text-xs uppercase tracking-wider shadow-xl transition-all cursor-pointer"
             >
               Open Investor Account
             </button>

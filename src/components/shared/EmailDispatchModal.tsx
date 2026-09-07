@@ -12,6 +12,17 @@ export const EmailDispatchModal: React.FC<EmailDispatchModalProps> = ({ email, i
   const [activeTab, setActiveTab] = useState<'preview' | 'source' | 'meta'>('preview');
   const [copied, setCopied] = useState(false);
 
+  React.useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
   if (!isOpen || !email) return null;
 
   const handleCopyToken = () => {
@@ -21,8 +32,18 @@ export const EmailDispatchModal: React.FC<EmailDispatchModalProps> = ({ email, i
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-[#0a0a0a] border border-white/20 rounded-2xl w-full max-w-2xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+    <div 
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) {
+          onClose();
+        }
+      }}
+    >
+      <div 
+        onClick={(e) => e.stopPropagation()}
+        className="bg-[#0a0a0a] border border-white/20 rounded-2xl w-full max-w-2xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden"
+      >
         
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-white/10 bg-[#050505]">
@@ -45,10 +66,14 @@ export const EmailDispatchModal: React.FC<EmailDispatchModalProps> = ({ email, i
           </div>
 
           <button 
+            type="button"
             onClick={onClose}
-            className="p-1.5 text-gray-400 hover:text-white rounded-lg hover:bg-white/10 transition-colors"
+            className="flex items-center gap-1 px-2.5 py-1.5 text-stone-300 hover:text-white rounded-xl bg-white/5 hover:bg-white/15 border border-white/15 transition-colors cursor-pointer text-xs font-semibold"
+            aria-label="Close email modal"
+            title="Close dialog (Esc)"
           >
-            <X className="w-5 h-5" />
+            <span>Close</span>
+            <X className="w-4 h-4 text-amber-400" />
           </button>
         </div>
 

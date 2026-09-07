@@ -22,14 +22,6 @@ export const Footer: React.FC = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleAdminConsoleClick = () => {
-    if (isAuthenticated && user.role === 'admin') {
-      navigate('admin');
-    } else {
-      openAuthModal('admin');
-    }
-  };
-
   return (
     <footer className="bg-[#050505] text-gray-400 border-t border-white/10 text-xs mt-auto">
       {/* Institutional Reassurance Bar */}
@@ -217,12 +209,8 @@ export const Footer: React.FC = () => {
                 </button>
               </li>
               <li>
-                <button 
-                  onClick={handleAdminConsoleClick}
-                  className="text-amber-500 hover:text-amber-400 font-semibold flex items-center gap-1 cursor-pointer"
-                >
-                  <span>Admin Control Console</span>
-                  <ChevronRight className="w-3 h-3" />
+                <button onClick={() => navigate('investments')} className="hover:text-amber-400 transition-colors cursor-pointer">
+                  Asset Allocations & Yield
                 </button>
               </li>
             </ul>

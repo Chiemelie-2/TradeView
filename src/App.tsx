@@ -3,13 +3,11 @@ import { AppProvider, useApp } from './context/AppContext';
 import { Navbar } from './components/layout/Navbar';
 import { Footer } from './components/layout/Footer';
 import { ToastContainer } from './components/shared/ToastContainer';
-import { SmartsuppWidget } from './components/support/SmartsuppWidget';
 import { AuthModal } from './components/auth/AuthModal';
 import { AdminAccessGuard } from './components/admin/AdminAccessGuard';
+import { InvestorAccessGuard } from './components/investor/InvestorAccessGuard';
 import { EmailDispatchModal } from './components/shared/EmailDispatchModal';
 import { GoogleEmailVerificationModal } from './components/auth/GoogleEmailVerificationModal';
-import { SmartsuppConfigModal } from './components/support/SmartsuppConfigModal';
-import { SupabaseConfigModal } from './components/database/SupabaseConfigModal';
 
 // Public Pages
 import { HomePage } from './components/public/HomePage';
@@ -42,6 +40,7 @@ const AppContent: React.FC = () => {
     user, 
     isAuthenticated, 
     isAuthModalOpen, 
+    authModalMode,
     closeAuthModal, 
     authModalDefaultRole,
     openAuthModal,
@@ -49,12 +48,7 @@ const AppContent: React.FC = () => {
     closeEmailModal,
     lastDispatchedEmail,
     isGoogleVerifyModalOpen,
-    closeGoogleVerifyModal,
-    isSmartsuppModalOpen,
-    closeSmartsuppModal,
-    isSupabaseModalOpen,
-    closeSupabaseModal,
-    syncWithSupabase
+    closeGoogleVerifyModal
   } = useApp();
 
   // Scroll to top upon route change
@@ -86,26 +80,83 @@ const AppContent: React.FC = () => {
       case 'legal':
         return <LegalPage />;
 
+      // Protected Investor Routes: Require user to have an authenticated account
       case 'dashboard':
       case 'portfolio':
+        if (!isAuthenticated) {
+          return (
+            <InvestorAccessGuard 
+              onOpenSignIn={() => openAuthModal('signin', 'investor')} 
+              onOpenRegister={() => openAuthModal('register', 'investor')} 
+            />
+          );
+        }
         return <InvestorDashboard />;
       case 'deposit':
+        if (!isAuthenticated) {
+          return (
+            <InvestorAccessGuard 
+              onOpenSignIn={() => openAuthModal('signin', 'investor')} 
+              onOpenRegister={() => openAuthModal('register', 'investor')} 
+            />
+          );
+        }
         return <DepositFlow />;
       case 'withdraw':
+        if (!isAuthenticated) {
+          return (
+            <InvestorAccessGuard 
+              onOpenSignIn={() => openAuthModal('signin', 'investor')} 
+              onOpenRegister={() => openAuthModal('register', 'investor')} 
+            />
+          );
+        }
         return <WithdrawalFlow />;
       case 'transactions':
+        if (!isAuthenticated) {
+          return (
+            <InvestorAccessGuard 
+              onOpenSignIn={() => openAuthModal('signin', 'investor')} 
+              onOpenRegister={() => openAuthModal('register', 'investor')} 
+            />
+          );
+        }
         return <TransactionsPage />;
       case 'kyc':
+        if (!isAuthenticated) {
+          return (
+            <InvestorAccessGuard 
+              onOpenSignIn={() => openAuthModal('signin', 'investor')} 
+              onOpenRegister={() => openAuthModal('register', 'investor')} 
+            />
+          );
+        }
         return <KycWizard />;
       case 'documents':
+        if (!isAuthenticated) {
+          return (
+            <InvestorAccessGuard 
+              onOpenSignIn={() => openAuthModal('signin', 'investor')} 
+              onOpenRegister={() => openAuthModal('register', 'investor')} 
+            />
+          );
+        }
         return <DocumentsPage />;
       case 'profile':
+        if (!isAuthenticated) {
+          return (
+            <InvestorAccessGuard 
+              onOpenSignIn={() => openAuthModal('signin', 'investor')} 
+              onOpenRegister={() => openAuthModal('register', 'investor')} 
+            />
+          );
+        }
         return <ProfileSecurityPage />;
 
       case 'admin':
         // Strict role-based guard: only authenticated users with admin role can view AdminControlCenter
         if (!isAuthenticated || user.role !== 'admin') {
-          return <AdminAccessGuard onOpenAuthModal={() => openAuthModal('admin')} />;
+          return <AdminAccessGuard onOpenAuthModal={() => openAuthModal('signin', 'admin')} />;
         }
         return <AdminControlCenter />;
 
@@ -141,6 +192,7 @@ const AppContent: React.FC = () => {
       <AuthModal 
         isOpen={isAuthModalOpen} 
         onClose={closeAuthModal} 
+        defaultMode={authModalMode}
         defaultRole={authModalDefaultRole} 
       />
 
@@ -156,24 +208,6 @@ const AppContent: React.FC = () => {
         isOpen={isGoogleVerifyModalOpen}
         onClose={closeGoogleVerifyModal}
       />
-
-      {/* Smartsupp Live Chat Configuration Modal */}
-      <SmartsuppConfigModal
-        isOpen={isSmartsuppModalOpen}
-        onClose={closeSmartsuppModal}
-      />
-
-      {/* Supabase Database Connection Modal */}
-      <SupabaseConfigModal
-        isOpen={isSupabaseModalOpen}
-        onClose={closeSupabaseModal}
-        onConnected={() => {
-          syncWithSupabase();
-        }}
-      />
-
-      {/* Smartsupp AI Concierge Widget (Hidden on Admin) */}
-      <SmartsuppWidget />
     </div>
   );
 };

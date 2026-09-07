@@ -2,27 +2,24 @@ import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { pageTranslations } from '../../i18n/pageTranslations';
 import { 
-  ShieldCheck, 
   Lock, 
   Mail, 
   Key, 
   X, 
-  UserCheck, 
-  ShieldAlert, 
   ArrowRight, 
-  Briefcase, 
   Fingerprint,
   UserPlus,
   LogIn,
   Building2,
   CheckCircle2,
-  Sparkles
+  ShieldCheck
 } from 'lucide-react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion } from 'motion/react';
 
 interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
+  defaultMode?: 'register' | 'signin';
   defaultRole?: 'investor' | 'admin';
 }
 
@@ -47,7 +44,12 @@ const GoogleIcon: React.FC<{ className?: string }> = ({ className = "w-4 h-4" })
   </svg>
 );
 
-export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultRole = 'investor' }) => {
+export const AuthModal: React.FC<AuthModalProps> = ({ 
+  isOpen, 
+  onClose, 
+  defaultMode = 'register',
+  defaultRole = 'investor' 
+}) => {
   const { 
     language, 
     login, 
@@ -59,12 +61,12 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultRo
   const pageT = pageTranslations[language] || pageTranslations.en;
   const authT = pageT.auth;
 
-  const [authMode, setAuthMode] = useState<'signin' | 'register'>('signin');
-  const [selectedRole, setSelectedRole] = useState<'investor' | 'admin'>(defaultRole);
+  const [authMode, setAuthMode] = useState<'signin' | 'register'>(defaultMode);
 
   // Form states
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [fullName, setFullName] = useState('');
   const [accountType, setAccountType] = useState<'individual' | 'institutional' | 'family_office'>('individual');
   const [rememberMe, setRememberMe] = useState(true);
@@ -75,43 +77,49 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultRo
   const [googleEmailInput, setGoogleEmailInput] = useState('princesamuel0903@gmail.com');
   const [googleNameInput, setGoogleNameInput] = useState('Samuel Prince');
 
-  // Sync default credentials
+  // Reset fields on open and respect defaultMode
   React.useEffect(() => {
     if (isOpen) {
-      setSelectedRole(defaultRole);
-      if (defaultRole === 'admin') {
-        setEmail('admin@tradeverge.live');
-        setPassword('••••••••••••');
-      } else {
-        setEmail('a.montgomery@vancecapital.org');
-        setPassword('••••••••••••');
-      }
+      setAuthMode(defaultMode);
+      setEmail('');
+      setPassword('');
+      setConfirmPassword('');
+      setIsSubmitting(false);
     }
-  }, [isOpen, defaultRole]);
+  }, [isOpen, defaultMode]);
+
+  // Handle Escape key to close modal
+  React.useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        if (isGooglePromptOpen) {
+          setIsGooglePromptOpen(false);
+        } else {
+          onClose();
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, isGooglePromptOpen, onClose]);
 
   if (!isOpen) return null;
 
-  const handleRoleTabChange = (role: 'investor' | 'admin') => {
-    setSelectedRole(role);
-    if (role === 'admin') {
-      setEmail('admin@tradeverge.live');
-      setPassword('••••••••••••');
-    } else {
-      setEmail('a.montgomery@vancecapital.org');
-      setPassword('••••••••••••');
-    }
-  };
-
-  const handleSignInSubmit = (e: React.FormEvent) => {
+  const handleSignInSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email.trim()) {
-      showToast('Authentication Error', 'Please enter your authorized email address.', 'warning');
+      showToast('Authentication Error', 'Please enter your registered email address.', 'warning');
+      return;
+    }
+    if (!password) {
+      showToast('Authentication Error', 'Please enter your account password.', 'warning');
       return;
     }
 
     setIsSubmitting(true);
-    setTimeout(() => {
-      const result = login(email, password, selectedRole);
+    try {
+      const result = await login(email, password);
       setIsSubmitting(false);
       if (result.success) {
         showToast('Authentication Verified', authT.loggedInSuccess, 'success');
@@ -119,60 +127,69 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultRo
       } else {
         showToast('Access Denied', result.message || authT.invalidCredentials, 'danger');
       }
-    }, 350);
+    } catch (err: any) {
+      setIsSubmitting(false);
+      showToast('Connection Error', err.message || 'Unable to connect to database server.', 'danger');
+    }
   };
 
-  const handleRegisterSubmit = (e: React.FormEvent) => {
+  const handleRegisterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email.trim() || !fullName.trim()) {
       showToast('Registration Error', 'Please provide your full legal name and email address.', 'warning');
       return;
     }
+    if (!password || password.length < 6) {
+      showToast('Registration Error', 'Password must be at least 6 characters.', 'warning');
+      return;
+    }
+    if (password !== confirmPassword) {
+      showToast('Registration Error', 'Passwords do not match. Please verify.', 'warning');
+      return;
+    }
 
     setIsSubmitting(true);
-    setTimeout(() => {
-      registerAccount(fullName, email, accountType, 'email', password);
+    try {
+      const result = await registerAccount(fullName, email, accountType, 'email', password);
       setIsSubmitting(false);
-      onClose();
-    }, 450);
+      if (result.success) {
+        onClose();
+      } else {
+        showToast('Registration Failed', result.message || 'Could not register account.', 'danger');
+      }
+    } catch (err: any) {
+      setIsSubmitting(false);
+      showToast('Database Error', err.message || 'Could not persist user to database.', 'danger');
+    }
   };
 
-  const handleGoogleAuthProceed = () => {
+  const handleGoogleAuthProceed = async () => {
     setIsSubmitting(true);
     setIsGooglePromptOpen(false);
-    setTimeout(() => {
-      loginWithGoogle(googleEmailInput, googleNameInput);
+    try {
+      await loginWithGoogle(googleEmailInput, googleNameInput);
       setIsSubmitting(false);
       onClose();
-    }, 400);
-  };
-
-  const handleQuickDemoInvestor = () => {
-    setIsSubmitting(true);
-    setTimeout(() => {
-      login('a.montgomery@vancecapital.org', 'demo123', 'investor');
+    } catch (err: any) {
       setIsSubmitting(false);
-      showToast('Investor Portal Unlocked', 'Authenticated as Sir Arthur Montgomery (Family Office Tier 2).', 'success');
-      onClose();
-    }, 200);
-  };
-
-  const handleQuickDemoAdmin = () => {
-    setIsSubmitting(true);
-    setTimeout(() => {
-      login('admin@tradeverge.live', 'admin123', 'admin');
-      setIsSubmitting(false);
-      showToast('Admin Clearance Granted', 'Authenticated as Marcus Vance (Chief Compliance Officer).', 'success');
-      onClose();
-    }, 200);
+      showToast('Google Auth Error', err.message || 'Failed to authenticate with Google.', 'danger');
+    }
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md overflow-y-auto">
+    <div 
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md overflow-y-auto"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) {
+          onClose();
+        }
+      }}
+    >
       <motion.div
         initial={{ opacity: 0, scale: 0.96, y: 12 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.96, y: 12 }}
+        onClick={(e) => e.stopPropagation()}
         className="relative w-full max-w-lg bg-[#0d0d0d] border border-white/15 rounded-2xl shadow-2xl overflow-hidden my-8"
       >
         {/* Top Header */}
@@ -185,84 +202,57 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultRo
               <div>
                 <h3 className="text-base font-bold text-white tracking-tight">
                   {authMode === 'register' 
-                    ? 'Register Institutional Depository Account' 
-                    : (selectedRole === 'admin' ? authT.adminTitle : authT.investorTitle)
+                    ? 'Register Depository Account' 
+                    : 'Account Authentication'
                   }
                 </h3>
                 <p className="text-xs text-stone-400">
                   {authMode === 'register'
-                    ? 'Automatic verification email dispatched upon registration.'
-                    : (selectedRole === 'admin' ? authT.adminDesc : authT.investorDesc)
+                    ? 'All registered accounts are committed directly to the secure database.'
+                    : 'Enter your credentials. Administrator accounts grant executive access directly.'
                   }
                 </p>
               </div>
             </div>
             <button
+              type="button"
               onClick={onClose}
-              className="p-1.5 rounded-lg text-stone-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
-              aria-label="Close"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-stone-200 hover:text-white transition-all cursor-pointer text-xs font-semibold shadow-sm"
+              aria-label="Close authentication modal"
+              title="Close dialog (Esc)"
             >
-              <X className="w-5 h-5" />
+              <span>Close</span>
+              <X className="w-4 h-4 text-amber-400" />
             </button>
           </div>
 
-          {/* Mode Switcher: Sign In vs Register */}
-          <div className="grid grid-cols-2 gap-1.5 p-1 bg-[#050505] rounded-xl border border-white/5 mb-3">
-            <button
-              type="button"
-              onClick={() => setAuthMode('signin')}
-              className={`flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
-                authMode === 'signin'
-                  ? 'bg-amber-500 text-black shadow-md'
-                  : 'text-stone-400 hover:text-white hover:bg-white/5'
-              }`}
-            >
-              <LogIn className="w-3.5 h-3.5" />
-              <span>Client Sign In</span>
-            </button>
+          {/* Mode Switcher: Create Account vs Sign In */}
+          <div className="grid grid-cols-2 gap-1.5 p-1 bg-[#050505] rounded-xl border border-white/5">
             <button
               type="button"
               onClick={() => setAuthMode('register')}
               className={`flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
                 authMode === 'register'
-                  ? 'bg-amber-500 text-black shadow-md'
+                  ? 'bg-amber-500 text-black shadow-md font-bold'
                   : 'text-stone-400 hover:text-white hover:bg-white/5'
               }`}
             >
               <UserPlus className="w-3.5 h-3.5" />
-              <span>Register Account</span>
+              <span>Create Account</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setAuthMode('signin')}
+              className={`flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                authMode === 'signin'
+                  ? 'bg-amber-500 text-black shadow-md font-bold'
+                  : 'text-stone-400 hover:text-white hover:bg-white/5'
+              }`}
+            >
+              <LogIn className="w-3.5 h-3.5" />
+              <span>Sign In</span>
             </button>
           </div>
-
-          {/* Role selector in signin mode */}
-          {authMode === 'signin' && (
-            <div className="grid grid-cols-2 gap-1.5 p-1 bg-[#050505]/50 rounded-xl border border-white/5">
-              <button
-                type="button"
-                onClick={() => handleRoleTabChange('investor')}
-                className={`flex items-center justify-center gap-2 py-1.5 px-3 rounded-lg text-[11px] font-semibold transition-all cursor-pointer ${
-                  selectedRole === 'investor'
-                    ? 'bg-white/15 text-white shadow-sm'
-                    : 'text-stone-400 hover:text-white'
-                }`}
-              >
-                <Briefcase className="w-3 h-3 text-amber-400" />
-                <span>{authT.investorTab}</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => handleRoleTabChange('admin')}
-                className={`flex items-center justify-center gap-2 py-1.5 px-3 rounded-lg text-[11px] font-semibold transition-all cursor-pointer ${
-                  selectedRole === 'admin'
-                    ? 'bg-white/15 text-white shadow-sm'
-                    : 'text-stone-400 hover:text-white'
-                }`}
-              >
-                <ShieldAlert className="w-3 h-3 text-amber-500" />
-                <span>{authT.adminTab}</span>
-              </button>
-            </div>
-          )}
         </div>
 
         <div className="p-6 space-y-4">
@@ -276,13 +266,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultRo
               <GoogleIcon className="w-4 h-4" />
               <span>{authMode === 'register' ? 'Register with Google Account' : 'Continue with Google'}</span>
               <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-mono ml-auto">
-                Instant Verification
+                Database Sync
               </span>
             </button>
             <div className="relative flex py-2 items-center">
               <div className="flex-grow border-t border-white/10"></div>
               <span className="flex-shrink mx-3 text-[10px] uppercase font-mono text-stone-500 tracking-wider">
-                Or continue with institutional email
+                Or with registered email & password
               </span>
               <div className="flex-grow border-t border-white/10"></div>
             </div>
@@ -292,11 +282,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultRo
           {authMode === 'signin' ? (
             <form onSubmit={handleSignInSubmit} className="space-y-4">
               <div>
-                <label className="block text-xs font-medium text-stone-300 mb-1.5 flex items-center justify-between">
-                  <span>{authT.emailLabel}</span>
-                  {selectedRole === 'admin' && (
-                    <span className="text-[10px] text-amber-500 font-mono font-semibold">@tradeverge.live only</span>
-                  )}
+                <label className="block text-xs font-medium text-stone-300 mb-1.5">
+                  Registered Email Address <span className="text-amber-500">*</span>
                 </label>
                 <div className="relative">
                   <Mail className="w-4 h-4 text-stone-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -304,7 +291,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultRo
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder={selectedRole === 'admin' ? 'admin@tradeverge.live' : 'investor@vancecapital.org'}
+                    placeholder="e.g. investor@vancecapital.org or admin@tradeverge.live"
                     className="w-full bg-[#050505] border border-white/10 rounded-xl pl-10 pr-4 py-2.5 text-xs text-white placeholder:text-stone-600 focus:outline-none focus:border-amber-500 transition-colors"
                     required
                   />
@@ -313,10 +300,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultRo
 
               <div>
                 <label className="block text-xs font-medium text-stone-300 mb-1.5 flex items-center justify-between">
-                  <span>{authT.passwordLabel}</span>
+                  <span>Account Password <span className="text-amber-500">*</span></span>
                   <span className="text-[10px] text-stone-500 flex items-center gap-1">
                     <Fingerprint className="w-3 h-3 text-emerald-400" />
-                    {authT.twoFaBadge}
+                    Encrypted
                   </span>
                 </label>
                 <div className="relative">
@@ -348,54 +335,52 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultRo
                 </span>
               </div>
 
-              {/* Primary Submit Button */}
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="w-full py-3 px-4 rounded-xl bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-black font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all shadow-lg hover:shadow-amber-500/20 cursor-pointer"
-              >
-                {isSubmitting ? (
-                  <span>{authT.signingIn}</span>
-                ) : (
-                  <>
-                    <span>{authT.signInButton}</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </>
-                )}
-              </button>
+              {/* Primary Submit Button & Cancel Action */}
+              <div className="flex items-center gap-2 pt-1">
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="w-1/3 py-3 px-4 rounded-xl bg-white/5 hover:bg-white/10 border border-white/15 text-stone-300 hover:text-white font-semibold text-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5"
+                >
+                  <X className="w-4 h-4 text-amber-400" />
+                  <span>Cancel</span>
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="flex-1 py-3 px-4 rounded-xl bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-black font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all shadow-lg hover:shadow-amber-500/20 cursor-pointer"
+                >
+                  {isSubmitting ? (
+                    <span>Verifying with Database...</span>
+                  ) : (
+                    <>
+                      <span>Sign In</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </>
+                  )}
+                </button>
+              </div>
 
-              {/* Quick Demo Credentials */}
-              <div className="pt-2 border-t border-white/10 space-y-2">
-                <div className="text-[10px] uppercase tracking-wider text-stone-500 font-bold text-center">
-                  {authT.demoCredentialsTitle}
+              {/* Database security assurance notice */}
+              <div className="p-3 rounded-xl bg-white/[0.02] border border-white/10 text-xs text-stone-400 space-y-1">
+                <div className="flex items-center gap-1.5 text-stone-300 font-semibold text-[11px]">
+                  <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
+                  <span>Strict Database Verification</span>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  <button
-                    type="button"
-                    onClick={handleQuickDemoInvestor}
-                    className="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-left transition-colors group cursor-pointer"
-                  >
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="text-xs font-semibold text-white group-hover:text-amber-400">Investor Role</span>
-                      <UserCheck className="w-3.5 h-3.5 text-emerald-400" />
-                    </div>
-                    <div className="text-[10px] text-stone-400 truncate">Arthur Montgomery</div>
-                    <div className="text-[9px] text-stone-500 font-mono">Unlocks Investor Portal</div>
-                  </button>
+                <p className="text-[11px] text-stone-500 leading-relaxed">
+                  Only accounts registered in the database are allowed access. Admin credentials directly unlock the executive management suite upon login.
+                </p>
+              </div>
 
-                  <button
-                    type="button"
-                    onClick={handleQuickDemoAdmin}
-                    className="p-2.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-left transition-colors group cursor-pointer"
-                  >
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="text-xs font-semibold text-amber-400">Admin Role</span>
-                      <ShieldAlert className="w-3.5 h-3.5 text-amber-500" />
-                    </div>
-                    <div className="text-[10px] text-stone-300 truncate">Marcus Vance (CCO)</div>
-                    <div className="text-[9px] text-amber-500/80 font-mono">Unlocks Admin Console</div>
-                  </button>
-                </div>
+              <div className="pt-2 text-center text-xs text-stone-400">
+                <span>Don't have a registered account yet? </span>
+                <button
+                  type="button"
+                  onClick={() => setAuthMode('register')}
+                  className="text-amber-400 hover:text-amber-300 font-semibold underline underline-offset-2 cursor-pointer"
+                >
+                  Register here
+                </button>
               </div>
             </form>
           ) : (
@@ -403,7 +388,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultRo
             <form onSubmit={handleRegisterSubmit} className="space-y-4">
               <div>
                 <label className="block text-xs font-medium text-stone-300 mb-1.5">
-                  Full Legal Name / Entity Name
+                  Full Legal Name / Entity Name <span className="text-amber-500">*</span>
                 </label>
                 <div className="relative">
                   <Building2 className="w-4 h-4 text-stone-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -420,7 +405,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultRo
 
               <div>
                 <label className="block text-xs font-medium text-stone-300 mb-1.5">
-                  Institutional Email Address
+                  Email Address <span className="text-amber-500">*</span>
                 </label>
                 <div className="relative">
                   <Mail className="w-4 h-4 text-stone-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -434,7 +419,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultRo
                   />
                 </div>
                 <span className="text-[10px] text-amber-400/90 mt-1 block">
-                  * An official cryptographic confirmation email will be delivered to this address upon registration.
+                  * Synced directly to database; confirmation email dispatched immediately.
                 </span>
               </div>
 
@@ -466,7 +451,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultRo
 
               <div>
                 <label className="block text-xs font-medium text-stone-300 mb-1.5">
-                  Account Password / Master Passphrase
+                  Account Password <span className="text-amber-500">*</span>
                 </label>
                 <div className="relative">
                   <Key className="w-4 h-4 text-stone-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -474,38 +459,66 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultRo
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Create robust passphrase"
+                    placeholder="Minimum 6 characters"
+                    className="w-full bg-[#050505] border border-white/10 rounded-xl pl-10 pr-4 py-2.5 text-xs text-white placeholder:text-stone-600 focus:outline-none focus:border-amber-500 transition-colors"
+                    required
+                    minLength={6}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-stone-300 mb-1.5">
+                  Confirm Password <span className="text-amber-500">*</span>
+                </label>
+                <div className="relative">
+                  <Key className="w-4 h-4 text-stone-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="Repeat password"
                     className="w-full bg-[#050505] border border-white/10 rounded-xl pl-10 pr-4 py-2.5 text-xs text-white placeholder:text-stone-600 focus:outline-none focus:border-amber-500 transition-colors"
                     required
                   />
                 </div>
               </div>
 
-              {/* Registration Notice */}
-              <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-[11px] text-stone-300 leading-relaxed">
-                <div className="flex items-start gap-2">
-                  <ShieldCheck className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
-                  <p>
-                    By registering, an off-balance-sheet segregated custodial sub-ledger is provisioned. An automated onboarding confirmation with your Depository ID and verification token will be dispatched to your email immediately.
-                  </p>
-                </div>
+              <div className="flex items-center gap-2 pt-1">
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="w-1/3 py-3 px-4 rounded-xl bg-white/5 hover:bg-white/10 border border-white/15 text-stone-300 hover:text-white font-semibold text-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5"
+                >
+                  <X className="w-4 h-4 text-amber-400" />
+                  <span>Cancel</span>
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="flex-1 py-3 px-4 rounded-xl bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-black font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all shadow-lg hover:shadow-amber-500/20 cursor-pointer"
+                >
+                  {isSubmitting ? (
+                    <span>Registering to Database...</span>
+                  ) : (
+                    <>
+                      <span>Register Account</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </>
+                  )}
+                </button>
               </div>
 
-              {/* Submit Registration Button */}
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="w-full py-3 px-4 rounded-xl bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-black font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all shadow-lg hover:shadow-amber-500/20 cursor-pointer"
-              >
-                {isSubmitting ? (
-                  <span>Dispatching Registration...</span>
-                ) : (
-                  <>
-                    <span>Register Account & Send Verification Email</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </>
-                )}
-              </button>
+              <div className="text-center text-xs text-stone-400 pt-1">
+                <span>Already registered in database? </span>
+                <button
+                  type="button"
+                  onClick={() => setAuthMode('signin')}
+                  className="text-amber-400 hover:text-amber-300 font-semibold underline underline-offset-2 cursor-pointer"
+                >
+                  Sign in
+                </button>
+              </div>
             </form>
           )}
         </div>
@@ -513,23 +526,36 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultRo
 
       {/* Google Account Confirmation Modal */}
       {isGooglePromptOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-sm">
-          <div className="bg-[#111111] border border-white/20 rounded-2xl w-full max-w-sm p-6 space-y-4 shadow-2xl animate-in fade-in zoom-in-95">
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-sm"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              setIsGooglePromptOpen(false);
+            }
+          }}
+        >
+          <div 
+            onClick={(e) => e.stopPropagation()}
+            className="bg-[#111111] border border-white/20 rounded-2xl w-full max-w-sm p-6 space-y-4 shadow-2xl animate-in fade-in zoom-in-95"
+          >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2.5">
                 <GoogleIcon className="w-5 h-5" />
                 <span className="font-bold text-white text-sm">Sign in with Google</span>
               </div>
               <button 
+                type="button"
                 onClick={() => setIsGooglePromptOpen(false)}
-                className="text-stone-400 hover:text-white p-1"
+                className="flex items-center gap-1 p-1 px-2 rounded-lg text-stone-400 hover:text-white hover:bg-white/10 text-xs cursor-pointer"
+                aria-label="Close Google sign in"
               >
-                <X className="w-4 h-4" />
+                <span>Close</span>
+                <X className="w-4 h-4 text-amber-400" />
               </button>
             </div>
 
             <p className="text-xs text-stone-300">
-              TradeVerge Private Wealth will verify your email and provision your segregated custodial account.
+              Your Google account will be verified and stored directly in the database.
             </p>
 
             <div className="space-y-2.5">
@@ -556,21 +582,21 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultRo
 
             <div className="p-2.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-[11px] text-emerald-300 flex items-center gap-2">
               <CheckCircle2 className="w-4 h-4 shrink-0" />
-              <span>Automated registration confirmation will be sent to this email.</span>
+              <span>Registration will be synced to database and confirmation dispatched.</span>
             </div>
 
             <div className="flex gap-2 pt-2">
               <button
                 type="button"
                 onClick={() => setIsGooglePromptOpen(false)}
-                className="flex-1 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-stone-300 text-xs font-semibold"
+                className="flex-1 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-stone-300 text-xs font-semibold cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 type="button"
                 onClick={handleGoogleAuthProceed}
-                className="flex-1 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-black text-xs font-bold uppercase tracking-wider"
+                className="flex-1 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-black text-xs font-bold uppercase tracking-wider cursor-pointer"
               >
                 Verify & Enter
               </button>

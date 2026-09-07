@@ -13,21 +13,25 @@ import {
   SupportTicket 
 } from '../types';
 
-export const initialUserProfile: UserProfile = {
-  id: 'usr_default',
-  fullName: 'Institutional Investor',
-  email: 'investor@tradeverge.live',
+export const emptyUserProfile: UserProfile = {
+  id: '',
+  fullName: '',
+  email: '',
   phone: '',
-  country: 'United States',
+  country: '',
   role: 'investor',
-  isEmailVerified: true,
+  isEmailVerified: false,
+  depositoryAccountId: '',
+  twoFactorEnabled: false,
   is2FAEnabled: false,
   kycStatus: 'not_started',
   kycTier: 1,
-  createdAt: new Date().toISOString(),
+  createdAt: '',
   accountType: 'individual',
   institutionName: ''
 };
+
+export const initialUserProfile: UserProfile = emptyUserProfile;
 
 export const initialAdminProfile: UserProfile = {
   id: 'usr_admin',

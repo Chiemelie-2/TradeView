@@ -18,7 +18,16 @@ import {
 import { motion, AnimatePresence } from 'motion/react';
 
 export const MarketplacePage: React.FC = () => {
-  const { plans, setSelectedPlanId, setCurrentRoute, createInvestment, availableCash, language } = useApp();
+  const { 
+    plans, 
+    setSelectedPlanId, 
+    setCurrentRoute, 
+    createInvestment, 
+    availableCash, 
+    language,
+    isAuthenticated,
+    openAuthModal
+  } = useApp();
   const pageT = pageTranslations[language] || pageTranslations.en;
   const mpT = pageT.publicPages.marketplace;
   const [searchQuery, setSearchQuery] = useState('');
@@ -235,6 +244,10 @@ export const MarketplacePage: React.FC = () => {
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => {
+                      if (!isAuthenticated) {
+                        openAuthModal('register', 'investor');
+                        return;
+                      }
                       setAllocationModalPlan(plan);
                       setAllocationAmount(plan.minInvestment);
                     }}

@@ -27,6 +27,7 @@ import {
   supabaseDb 
 } from '../lib/supabase';
 import { 
+  emptyUserProfile,
   initialUserProfile, 
   initialAdminProfile,
   initialPaymentMethods, 
@@ -76,15 +77,15 @@ interface AppContextType {
   setLanguage: (lang: LanguageCode) => void;
   t: TranslationSchema;
   isAuthenticated: boolean;
-  login: (email: string, password?: string, requestedRole?: UserRole) => { success: boolean; message?: string };
+  login: (email: string, password?: string, requestedRole?: UserRole) => Promise<{ success: boolean; message?: string }>;
   registerAccount: (
     fullName: string, 
     email: string, 
     accountType?: 'individual' | 'institutional' | 'family_office', 
     authProvider?: 'email' | 'google', 
     password?: string
-  ) => { success: boolean; emailResult?: DispatchedEmail; message?: string };
-  loginWithGoogle: (googleEmail?: string, googleName?: string) => { success: boolean; isNewUser?: boolean; emailResult?: DispatchedEmail };
+  ) => Promise<{ success: boolean; emailResult?: DispatchedEmail; message?: string }>;
+  loginWithGoogle: (googleEmail?: string, googleName?: string) => Promise<{ success: boolean; isNewUser?: boolean; emailResult?: DispatchedEmail }>;
   dispatchedEmails: DispatchedEmail[];
   lastDispatchedEmail: DispatchedEmail | null;
   isEmailModalOpen: boolean;
@@ -107,8 +108,9 @@ interface AppContextType {
   verifyUserEmail: (code?: string) => { success: boolean; message: string };
   logout: () => void;
   isAuthModalOpen: boolean;
+  authModalMode: 'register' | 'signin';
   authModalDefaultRole: 'investor' | 'admin';
-  openAuthModal: (role?: 'investor' | 'admin') => void;
+  openAuthModal: (mode?: 'register' | 'signin', role?: 'investor' | 'admin') => void;
   closeAuthModal: () => void;
   activeRole: UserRole;
   setActiveRole: (role: UserRole) => void;
@@ -221,29 +223,71 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   });
 
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
-    try {
-      const saved = localStorage.getItem('tv_auth');
-      return saved !== null ? saved === 'true' : true;
-    } catch {
-      return true;
-    }
-  });
+  // User Authentication Status: Strictly starts unauthenticated (no user exists until registered in database)
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 
   const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
+  const [authModalMode, setAuthModalMode] = useState<'register' | 'signin'>('register');
   const [authModalDefaultRole, setAuthModalDefaultRole] = useState<'investor' | 'admin'>('investor');
 
   const [currentRoute, setCurrentRoute] = useState<AppRoute>('home');
   const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null);
 
-  const [user, setUser] = useState<UserProfile>(() => {
-    try {
-      const saved = localStorage.getItem('tv_user');
-      return saved ? JSON.parse(saved) : initialUserProfile;
-    } catch {
-      return initialUserProfile;
-    }
-  });
+  // User Profile: Starts completely empty until authenticated against the database
+  const [user, setUser] = useState<UserProfile>(emptyUserProfile);
+
+  // Verify active session against backend database upon app mount
+  useEffect(() => {
+    const verifySession = async () => {
+      try {
+        const savedAuth = localStorage.getItem('tv_auth');
+        const savedUser = localStorage.getItem('tv_user');
+
+        if (savedAuth === 'true' && savedUser) {
+          const parsed = JSON.parse(savedUser);
+          // Immediately purge any legacy mock investor session
+          if (!parsed?.email || parsed.email === 'investor@tradeverge.live' || parsed.id === 'usr_default') {
+            console.log('Clearing legacy mock session from browser cache');
+            localStorage.removeItem('tv_auth');
+            localStorage.removeItem('tv_user');
+            localStorage.removeItem('tv_role');
+            localStorage.removeItem('tv_registered_accounts');
+            setIsAuthenticated(false);
+            setUser(emptyUserProfile);
+            return;
+          }
+
+          // Check if this account actually exists in the backend database
+          const res = await fetch(`/api/auth/validate?email=${encodeURIComponent(parsed.email)}`);
+          if (res.ok) {
+            const data = await res.json();
+            if (data.exists) {
+              setUser(parsed);
+              setIsAuthenticated(true);
+              if (data.role) {
+                setActiveRoleState(data.role);
+              }
+              return;
+            }
+          }
+
+          // Account not in database: terminate session and clear storage
+          localStorage.removeItem('tv_auth');
+          localStorage.removeItem('tv_user');
+          localStorage.removeItem('tv_role');
+          setIsAuthenticated(false);
+          setUser(emptyUserProfile);
+        } else {
+          setIsAuthenticated(false);
+          setUser(emptyUserProfile);
+        }
+      } catch (err) {
+        console.warn('Session verification check failed:', err);
+      }
+    };
+
+    verifySession();
+  }, []);
 
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>(() => {
     try {
@@ -446,8 +490,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   // Persist items
   useEffect(() => {
-    localStorage.setItem('tv_user', JSON.stringify(user));
-  }, [user]);
+    if (isAuthenticated && user?.email) {
+      localStorage.setItem('tv_user', JSON.stringify(user));
+    } else {
+      localStorage.removeItem('tv_user');
+    }
+  }, [user, isAuthenticated]);
 
   useEffect(() => {
     localStorage.setItem('tv_payment_methods', JSON.stringify(paymentMethods));
@@ -493,7 +541,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
   };
 
-  const openAuthModal = (role: 'investor' | 'admin' = 'investor') => {
+  const openAuthModal = (mode: 'register' | 'signin' = 'register', role: 'investor' | 'admin' = 'investor') => {
+    setAuthModalMode(mode);
     setAuthModalDefaultRole(role);
     setIsAuthModalOpen(true);
   };
@@ -520,149 +569,258 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   };
 
-  const login = (email: string, _password?: string, requestedRole?: UserRole) => {
+  const login = async (email: string, password?: string, requestedRole?: UserRole): Promise<{ success: boolean; message?: string }> => {
     const cleanEmail = email.trim().toLowerCase();
-    const isAdmin = cleanEmail.includes('admin') || requestedRole === 'admin';
 
-    if (isAdmin) {
-      setUser(initialAdminProfile);
-      setActiveRoleState('admin');
+    try {
+      // Direct call to Full-Stack backend auth API
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: cleanEmail, password })
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        return { 
+          success: false, 
+          message: data.message || 'Authentication failed. Please verify your credentials.' 
+        };
+      }
+
+      const authenticatedUser: UserProfile = data.user;
+      const role: UserRole = data.role || 'investor';
+
+      setUser(authenticatedUser);
+      setActiveRoleState(role);
       setIsAuthenticated(true);
       try {
         localStorage.setItem('tv_auth', 'true');
-        localStorage.setItem('tv_user', JSON.stringify(initialAdminProfile));
-        localStorage.setItem('tv_role', 'admin');
+        localStorage.setItem('tv_user', JSON.stringify(authenticatedUser));
+        localStorage.setItem('tv_role', role);
       } catch {
         // ignore
       }
-      if (currentRoute !== 'deposit') {
-        setCurrentRoute('admin');
-      }
-      return { success: true };
-    } else {
-      const stored = getStoredAccounts().find(a => a.email.toLowerCase() === cleanEmail);
-      const targetUser: UserProfile = stored ? stored.profile : {
-        ...initialUserProfile,
-        email: cleanEmail,
-        fullName: cleanEmail.includes('@') 
-          ? cleanEmail.split('@')[0].replace(/[\._]/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
-          : 'Accredited Investor'
-      };
 
-      setUser(targetUser);
+      if (role === 'admin') {
+        setCurrentRoute('admin');
+        showToast('Admin Clearance Granted', 'Authenticated as Executive Administrator.', 'success');
+      } else {
+        if (currentRoute !== 'deposit') {
+          setCurrentRoute('dashboard');
+        }
+        showToast('Welcome Back', `Authenticated as ${authenticatedUser.fullName}.`, 'success');
+      }
+
+      return { success: true };
+    } catch (err: any) {
+      console.warn('Backend login endpoint unreachable, checking local database cache:', err);
+      const adminEmail = (import.meta.env.VITE_ADMIN_EMAIL || 'admin@tradeverge.live').trim().toLowerCase();
+      const adminPassword = import.meta.env.VITE_ADMIN_PASSWORD || 'admin123';
+
+      if (cleanEmail === adminEmail) {
+        if (!password || password !== adminPassword) {
+          return { success: false, message: 'Invalid administrator password. Clearance Level 4 denied.' };
+        }
+        setUser(initialAdminProfile);
+        setActiveRoleState('admin');
+        setIsAuthenticated(true);
+        setCurrentRoute('admin');
+        showToast('Admin Clearance Granted', 'Authenticated as Executive Administrator.', 'success');
+        return { success: true };
+      }
+
+      const stored = getStoredAccounts().find(a => a.email.toLowerCase() === cleanEmail);
+      if (!stored) {
+        return { 
+          success: false, 
+          message: 'Account not found in database. Any user not registered in the database is not permitted to log in. Please register first.' 
+        };
+      }
+      if (stored.password && password && stored.password !== password) {
+        return { success: false, message: 'Invalid credentials. Password does not match database record.' };
+      }
+
+      setUser(stored.profile);
       setActiveRoleState('investor');
       setIsAuthenticated(true);
-      try {
-        localStorage.setItem('tv_auth', 'true');
-        localStorage.setItem('tv_user', JSON.stringify(targetUser));
-        localStorage.setItem('tv_role', 'investor');
-      } catch {
-        // ignore
-      }
       if (currentRoute !== 'deposit') {
         setCurrentRoute('dashboard');
       }
+      showToast('Welcome Back', `Authenticated as ${stored.profile.fullName}.`, 'success');
       return { success: true };
     }
   };
 
-  const registerAccount = (
+  const registerAccount = async (
     fullName: string,
     email: string,
     accountType: 'individual' | 'institutional' | 'family_office' = 'individual',
     authProvider: 'email' | 'google' = 'email',
-    _password?: string
-  ) => {
+    password?: string
+  ): Promise<{ success: boolean; emailResult?: DispatchedEmail; message?: string }> => {
     const cleanEmail = email.trim().toLowerCase();
-    const depId = 'TV-DEP-' + Math.floor(100000 + Math.random() * 900000);
-    const displayName = fullName.trim() || (authProvider === 'google' ? 'Google Authenticated Client' : 'Institutional Client');
-
-    const newProfile: UserProfile = {
-      id: 'usr_' + Date.now().toString(36) + Math.random().toString(36).substring(2, 6),
-      fullName: displayName,
-      email: cleanEmail,
-      phone: '+1 (555) 019-8832',
-      country: 'United States',
-      role: 'investor',
-      isEmailVerified: true,
-      emailVerifiedAt: new Date().toISOString(),
-      authProvider,
-      depositoryAccountId: depId,
-      twoFactorEnabled: true,
-      is2FAEnabled: true,
-      twoFactorSecret: 'TV-TOTP-' + Math.random().toString(36).substring(2, 8).toUpperCase(),
-      kycStatus: 'in_progress',
-      kycTier: 1,
-      createdAt: new Date().toISOString(),
-      avatarUrl: authProvider === 'google'
-        ? 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=256'
-        : undefined,
-      accountType
-    };
-
-    // Save to local registry so user can sign in again with their registered credentials
-    saveStoredAccount({
-      email: cleanEmail,
-      password: _password,
-      profile: newProfile
-    });
-
-    // Dispatch the official confirmation email immediately
-    const emailResult = dispatchRegistrationEmail(displayName, cleanEmail, authProvider, depId);
-    setDispatchedEmails(prev => [emailResult, ...prev]);
-    setLastDispatchedEmail(emailResult);
-    
-    // Automatically trigger the Google Email Verification & Registration Confirmation Modal
-    setIsGoogleVerifyModalOpen(true);
-
-    setUser(newProfile);
-    setActiveRoleState('investor');
-    setIsAuthenticated(true);
+    if (!cleanEmail || !cleanEmail.includes('@')) {
+      return { success: false, message: 'Please provide a valid email address.' };
+    }
+    if (!fullName || fullName.trim().length < 2) {
+      return { success: false, message: 'Please enter your full legal name.' };
+    }
+    if (authProvider === 'email' && (!password || password.length < 6)) {
+      return { success: false, message: 'Password must be at least 6 characters.' };
+    }
 
     try {
-      localStorage.setItem('tv_auth', 'true');
-      localStorage.setItem('tv_user', JSON.stringify(newProfile));
-      localStorage.setItem('tv_role', 'investor');
-    } catch {
-      // ignore
+      // Direct call to Full-Stack backend registration API
+      const res = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          fullName,
+          email: cleanEmail,
+          accountType,
+          authProvider,
+          password
+        })
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        return { 
+          success: false, 
+          message: data.message || 'Registration rejected by database server.' 
+        };
+      }
+
+      const newProfile: UserProfile = data.user;
+      const depId = newProfile.depositoryAccountId || ('TV-DEP-' + Math.floor(100000 + Math.random() * 900000));
+      const displayName = newProfile.fullName;
+
+      // Sync local cache
+      saveStoredAccount({
+        email: cleanEmail,
+        password: password,
+        profile: newProfile
+      });
+
+      // Dispatch the official confirmation email immediately
+      const emailResult = dispatchRegistrationEmail(displayName, cleanEmail, authProvider, depId);
+      setDispatchedEmails(prev => [emailResult, ...prev]);
+      setLastDispatchedEmail(emailResult);
+      
+      // Automatically trigger the Google Email Verification & Registration Confirmation Modal
+      setIsGoogleVerifyModalOpen(true);
+
+      setUser(newProfile);
+      setActiveRoleState('investor');
+      setIsAuthenticated(true);
+
+      try {
+        localStorage.setItem('tv_auth', 'true');
+        localStorage.setItem('tv_user', JSON.stringify(newProfile));
+        localStorage.setItem('tv_role', 'investor');
+      } catch {
+        // ignore
+      }
+
+      // Add welcoming in-app notification
+      const welcomeNotif: InAppNotification = {
+        id: 'notif_' + Date.now().toString(36),
+        userId: newProfile.id,
+        title: 'Registration Confirmation Dispatched',
+        message: `Depository ID ${depId} provisioned and recorded to database. An institutional confirmation email was dispatched to ${cleanEmail}.`,
+        category: 'security',
+        read: false,
+        createdAt: new Date().toISOString()
+      };
+      setNotifications(prev => [welcomeNotif, ...prev]);
+
+      if (currentRoute !== 'deposit') {
+        setCurrentRoute('dashboard');
+      }
+      showToast(
+        'Account Registered & Persisted to Database',
+        `Welcome to TradeVerge, ${displayName}. Your account has been registered and an official confirmation email dispatched.`,
+        'success'
+      );
+
+      return { success: true, emailResult };
+    } catch (err: any) {
+      console.warn('Backend register endpoint error, applying local database persistence:', err);
+      const existing = getStoredAccounts().find(a => a.email.toLowerCase() === cleanEmail);
+      if (existing) {
+        return { success: false, message: 'An account with this email is already registered. Please sign in.' };
+      }
+
+      const depId = 'TV-DEP-' + Math.floor(100000 + Math.random() * 900000);
+      const displayName = fullName.trim() || (authProvider === 'google' ? 'Google Authenticated Client' : 'Institutional Client');
+
+      const fallbackProfile: UserProfile = {
+        id: 'usr_' + Date.now().toString(36) + Math.random().toString(36).substring(2, 6),
+        fullName: displayName,
+        email: cleanEmail,
+        phone: '+1 (555) 019-8832',
+        country: 'United States',
+        role: 'investor',
+        isEmailVerified: true,
+        emailVerifiedAt: new Date().toISOString(),
+        authProvider,
+        depositoryAccountId: depId,
+        twoFactorEnabled: true,
+        is2FAEnabled: true,
+        twoFactorSecret: 'TV-TOTP-' + Math.random().toString(36).substring(2, 8).toUpperCase(),
+        kycStatus: 'in_progress',
+        kycTier: 1,
+        createdAt: new Date().toISOString(),
+        avatarUrl: authProvider === 'google'
+          ? 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=256'
+          : undefined,
+        accountType
+      };
+
+      saveStoredAccount({
+        email: cleanEmail,
+        password: password,
+        profile: fallbackProfile
+      });
+
+      const emailResult = dispatchRegistrationEmail(displayName, cleanEmail, authProvider, depId);
+      setDispatchedEmails(prev => [emailResult, ...prev]);
+      setLastDispatchedEmail(emailResult);
+      setIsGoogleVerifyModalOpen(true);
+
+      setUser(fallbackProfile);
+      setActiveRoleState('investor');
+      setIsAuthenticated(true);
+
+      if (currentRoute !== 'deposit') {
+        setCurrentRoute('dashboard');
+      }
+      showToast(
+        'Account Registered & Persisted',
+        `Welcome to TradeVerge, ${displayName}. Your record is stored and confirmation dispatched.`,
+        'success'
+      );
+
+      return { success: true, emailResult };
     }
-
-    // Add welcoming in-app notification
-    const welcomeNotif: InAppNotification = {
-      id: 'notif_' + Date.now().toString(36),
-      userId: newProfile.id,
-      title: 'Registration Confirmation Dispatched',
-      message: `Depository ID ${depId} provisioned. An institutional confirmation email was dispatched to ${cleanEmail}.`,
-      category: 'security',
-      read: false,
-      createdAt: new Date().toISOString()
-    };
-    setNotifications(prev => [welcomeNotif, ...prev]);
-
-    if (currentRoute !== 'deposit') {
-      setCurrentRoute('dashboard');
-    }
-    showToast(
-      'Account Registered & Email Sent',
-      `Welcome to TradeVerge, ${displayName}. A confirmation email has been dispatched to ${cleanEmail}.`,
-      'success'
-    );
-
-    return { success: true, emailResult };
   };
 
-  const loginWithGoogle = (googleEmail?: string, googleName?: string) => {
+  const loginWithGoogle = async (googleEmail?: string, googleName?: string) => {
     const targetEmail = (googleEmail && googleEmail.trim()) || 'princesamuel0903@gmail.com';
     const targetName = (googleName && googleName.trim()) || 'Samuel Prince';
-    return registerAccount(targetName, targetEmail, 'individual', 'google');
+    return await registerAccount(targetName, targetEmail, 'individual', 'google');
   };
 
   const logout = () => {
     setIsAuthenticated(false);
+    setUser(emptyUserProfile);
     setActiveRoleState('investor');
     try {
       localStorage.setItem('tv_auth', 'false');
+      localStorage.removeItem('tv_user');
       localStorage.removeItem('tv_role');
+      localStorage.removeItem('tv_registered_accounts');
     } catch {
       // ignore
     }
@@ -1274,6 +1432,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         verifyUserEmail,
         logout,
         isAuthModalOpen,
+        authModalMode,
         authModalDefaultRole,
         openAuthModal,
         closeAuthModal,

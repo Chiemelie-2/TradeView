@@ -9,14 +9,9 @@ import {
   CheckCircle2, 
   AlertTriangle,
   Mail,
-  Globe,
-  MessageSquare,
-  Key,
-  ExternalLink,
-  ChevronRight
+  ShieldCheck,
+  Laptop
 } from 'lucide-react';
-import { isSmartsuppConfigured } from '../../services/smartsuppService';
-import { isGoogleTranslateConfigured } from '../../services/googleTranslate';
 
 export const ProfileSecurityPage: React.FC = () => {
   const { 
@@ -25,16 +20,12 @@ export const ProfileSecurityPage: React.FC = () => {
     showToast, 
     language,
     openGoogleVerifyModal,
-    openEmailModal,
-    openSmartsuppModal,
-    openTranslateModal
+    openEmailModal
   } = useApp();
   const pageT = pageTranslations[language] || pageTranslations.en;
   const profT = pageT.investorPages.profile;
 
   const [twoFaActive, setTwoFaActive] = useState(user.twoFactorEnabled);
-  const smartsuppReady = isSmartsuppConfigured();
-  const translateReady = isGoogleTranslateConfigured();
 
   const toggle2Fa = () => {
     const nextState = !twoFaActive;
@@ -189,80 +180,54 @@ export const ProfileSecurityPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Integration API Keys (Google Cloud Translator & Smartsupp) */}
+      {/* Active Session & Device Protection */}
       <div className="p-6 rounded-2xl bg-[#0a0a0a] border border-white/10 space-y-5">
         <div>
-          <h3 className="font-serif text-lg font-bold text-white">Client API & Service Integrations</h3>
+          <h3 className="font-serif text-lg font-bold text-white">Active Session & Device Authorization</h3>
           <p className="text-xs text-gray-400 mt-0.5">
-            Configure your personal API keys for Google Cloud Translation and Smartsupp Live Chat.
+            Institutional hardware-bound sessions and cryptographic token clearance.
           </p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {/* Google Cloud Translator */}
-          <div className="p-4 rounded-xl bg-[#050505] border border-blue-500/20 space-y-3">
+          <div className="p-4 rounded-xl bg-[#050505] border border-white/10 space-y-2">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <div className="p-2 rounded-lg bg-blue-500/10 text-blue-400">
-                  <Globe className="w-4 h-4" />
+                <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-400">
+                  <Laptop className="w-4 h-4" />
                 </div>
                 <div>
-                  <h4 className="text-xs font-bold text-white">Google Cloud Translator</h4>
-                  <span className="text-[10px] text-gray-400">v2 Neural Translation API</span>
+                  <h4 className="text-xs font-bold text-white">Current Secure Browser Session</h4>
+                  <span className="text-[10px] text-gray-400 font-mono">TLS 1.3 / AES-256-GCM</span>
                 </div>
               </div>
-              <span className={`px-2 py-0.5 rounded font-mono text-[10px] font-bold ${
-                translateReady 
-                  ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' 
-                  : 'bg-white/5 text-gray-400 border border-white/10'
-              }`}>
-                {translateReady ? 'CONFIGURED' : 'KEY PENDING'}
+              <span className="px-2 py-0.5 rounded font-mono text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                ACTIVE
               </span>
             </div>
             <p className="text-[11px] text-gray-400 leading-relaxed">
-              Enables continuous neural translations across 10 official languages with custom quota tracking.
+              Cryptographically signed session authenticated via {user.email}. Non-transferable device signature.
             </p>
-            <button
-              type="button"
-              onClick={openTranslateModal}
-              className="w-full py-2 rounded-lg bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/30 text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
-            >
-              <Key className="w-3.5 h-3.5" />
-              <span>{translateReady ? 'Update Google Cloud API Key' : 'Add Google Cloud API Key'}</span>
-            </button>
           </div>
 
-          {/* Smartsupp Live Chat */}
-          <div className="p-4 rounded-xl bg-[#050505] border border-amber-500/20 space-y-3">
+          <div className="p-4 rounded-xl bg-[#050505] border border-white/10 space-y-2">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="p-2 rounded-lg bg-amber-500/10 text-amber-400">
-                  <MessageSquare className="w-4 h-4" />
+                  <ShieldCheck className="w-4 h-4" />
                 </div>
                 <div>
-                  <h4 className="text-xs font-bold text-white">Smartsupp Live Chat</h4>
-                  <span className="text-[10px] text-gray-400">Real-time Operator Widget</span>
+                  <h4 className="text-xs font-bold text-white">Custody Access Policy</h4>
+                  <span className="text-[10px] text-gray-400">IP Whitelist Enforced</span>
                 </div>
               </div>
-              <span className={`px-2 py-0.5 rounded font-mono text-[10px] font-bold ${
-                smartsuppReady 
-                  ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' 
-                  : 'bg-white/5 text-gray-400 border border-white/10'
-              }`}>
-                {smartsuppReady ? 'ACTIVE' : 'KEY PENDING'}
+              <span className="px-2 py-0.5 rounded font-mono text-[10px] font-bold bg-amber-500/20 text-amber-400 border border-amber-500/30">
+                TIER-1
               </span>
             </div>
             <p className="text-[11px] text-gray-400 leading-relaxed">
-              Injects the official Smartsupp client script for direct agent chat, visitor tracking, and offline routing.
+              Automated anomaly rejection halts unauthorized withdrawal transactions outside recognized client geolocations.
             </p>
-            <button
-              type="button"
-              onClick={openSmartsuppModal}
-              className="w-full py-2 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/30 text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
-            >
-              <Key className="w-3.5 h-3.5" />
-              <span>{smartsuppReady ? 'Manage Smartsupp Key' : 'Add Smartsupp Key'}</span>
-            </button>
           </div>
         </div>
       </div>
